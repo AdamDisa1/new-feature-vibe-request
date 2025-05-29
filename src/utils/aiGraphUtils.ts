@@ -34,30 +34,31 @@ export function createAIGraphData(aiResult: AIParseResult): AIGraphData {
     const color = AI_NODE_COLORS[nodeType as keyof typeof AI_NODE_COLORS] || AI_NODE_COLORS.utility;
     const icon = AI_NODE_ICONS[nodeType as keyof typeof AI_NODE_ICONS] || AI_NODE_ICONS.utility;
 
+    // Check if this is an entry point
+    const isEntryPoint = aiNode.description?.includes('[ENTRY POINT]') || aiNode.description?.includes('ENTRY POINT');
+    
+    // Clean description by removing [ENTRY POINT] markers for display
+    const cleanDescription = aiNode.description?.replace(/\*\*\[ENTRY POINT\]\*\*/g, '').replace(/\[ENTRY POINT\]/g, '').trim();
+
+    // Create multi-line label with title and description
+    const entryBadge = isEntryPoint ? ' 🚀' : '';
+    const titleLine = `${icon} ${aiNode.label}${entryBadge}`;
+    const descriptionText = cleanDescription || 'No description available';
+    
     return {
       id: aiNode.id,
-      type: 'default',
+      type: 'customAI',
       position: { x: 0, y: 0 }, // Will be set by layout
       data: {
-        label: `${icon} ${aiNode.label}`,
+        label: titleLine,
         description: aiNode.description,
+        cleanDescription: descriptionText,
         nodeType: nodeType,
         group: aiNode.group,
         aiNode: aiNode,
+        isEntryPoint: isEntryPoint,
       },
-      style: {
-        background: `linear-gradient(135deg, ${color}15, ${color}25)`,
-        border: `2px solid ${color}`,
-        borderRadius: '12px',
-        padding: '12px',
-        fontSize: '13px',
-        fontWeight: 'bold',
-        color: '#1a202c',
-        minWidth: '160px',
-        textAlign: 'center',
-        boxShadow: `0 2px 8px ${color}30`,
-      },
-      className: `ai-node ai-${nodeType}`,
+      className: `ai-node ai-${nodeType} ${isEntryPoint ? 'entry-point' : ''}`,
     };
   });
 
@@ -111,8 +112,8 @@ export function autoLayoutNodesByGroups(nodes: Node[], edges: Edge[]): { layoute
   const layoutedNodes: Node[] = [];
   
   // Layout configuration
-  const nodeSpacing = { x: 250, y: 120 };
-  const groupPadding = 50;
+  const nodeSpacing = { x: 400, y: 180 };
+  const groupPadding = 60;
   let currentX = 60;
 
   // Process each group
@@ -135,8 +136,8 @@ export function autoLayoutNodesByGroups(nodes: Node[], edges: Edge[]): { layoute
 
     // Calculate group background dimensions
     const maxRow = Math.ceil(groupNodes.length / 2);
-    const groupWidth = Math.max(nodeSpacing.x + 160, groupNodes.length > 1 ? nodeSpacing.x + 160 : 200);
-    const groupHeight = maxRow * nodeSpacing.y + 80;
+    const groupWidth = Math.max(nodeSpacing.x + 320, groupNodes.length > 1 ? nodeSpacing.x + 320 : 400);
+    const groupHeight = maxRow * nodeSpacing.y + 120;
 
     // Create group background
     const groupColor = getGroupColor(groupName);

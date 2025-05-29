@@ -18,10 +18,16 @@ import 'reactflow/dist/style.css';
 import { AIParseResult } from '../utils/aiParser';
 import { createAIGraphData } from '../utils/aiGraphUtils';
 import AIFunctionTooltip from './AIFunctionTooltip';
+import CustomAINode from './CustomAINode';
 
 interface AIDependencyGraphProps {
   aiResult: AIParseResult;
 }
+
+// Define custom node types
+const nodeTypes = {
+  customAI: CustomAINode,
+};
 
 const AIDependencyGraphInner: React.FC<AIDependencyGraphProps> = ({ aiResult }) => {
   const { fitView } = useReactFlow();
@@ -307,6 +313,7 @@ const AIDependencyGraphInner: React.FC<AIDependencyGraphProps> = ({ aiResult }) 
         onNodeMouseEnter={onNodeMouseEnter}
         onNodeMouseLeave={onNodeMouseLeave}
         onNodeMouseMove={onNodeMouseMove}
+        nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{
           padding: 0.2,

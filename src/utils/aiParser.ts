@@ -48,9 +48,15 @@ Please follow these rules:
    - \`group\`: e.g., \`"Page Functions"\`, \`"Backend Functions"\`, \`"External Services"\`, \`"Entry Points"\`
    - \`position\`: \`{ "x": 0, "y": 0 }\` (layout will be handled later)
 
-6. Only create edges that describe **actual logical flow or dependency** between two meaningful nodes (e.g., one function calls another).
+6. **Create meaningful connections** - This is important for visualization:
+   - Look for function calls, imports, data flow, and dependencies
+   - Create edges for: function A calls function B, function uses API, event triggers function
+   - Include edges for: imports, event listeners, data passing, API calls
+   - Don't skip edges - connections are essential for understanding code flow
 
-7. Output the final result as a JSON object like this:
+7. Only create edges that describe **actual logical flow or dependency** between two meaningful nodes (e.g., one function calls another).
+
+8. Output the final result as a JSON object like this:
 
 {
   "nodes": [
@@ -74,7 +80,7 @@ Please follow these rules:
   "edges": []
 }
 
-8. Add layout hints by ensuring \`group\` is assigned meaningfully, so the frontend can organize them in vertical columns or swimlanes.
+9. Add layout hints by ensuring \`group\` is assigned meaningfully, so the frontend can organize them in vertical columns or swimlanes.
 
 Now analyze the following Velo code and return only the JSON:`;
 
