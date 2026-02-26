@@ -432,7 +432,7 @@ function NotPreviewable({ extension }: { extension: Extension }) {
         style={{ background: '#2d2d30', borderColor: '#3e3e42' }}
       >
         <div className="flex items-start gap-3">
-          <Info size={18} style={{ color: '#858585', marginTop: 1, shrink: 0 }} />
+          <Info size={18} style={{ color: '#858585', marginTop: 1, flexShrink: 0 }} />
           <div>
             <p className="text-sm font-semibold mb-1" style={{ color: '#cccccc' }}>{info.title}</p>
             <p className="text-xs leading-relaxed" style={{ color: '#858585' }}>{info.reason}</p>
