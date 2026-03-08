@@ -1,4 +1,4 @@
-import { Extension } from './types';
+import { Extension, CreatedApp } from './types';
 
 export const MOCK_EXTENSIONS: Extension[] = [
   // ─── Components ────────────────────────────────────────────────────────────
@@ -1236,5 +1236,157 @@ export default function InventoryManager() {
       },
     ],
     history: [],
+  },
+];
+
+// ─── Mock Apps (My Creations) ────────────────────────────────────────────────
+
+export const MOCK_APPS: CreatedApp[] = [
+  {
+    id: 'app-shop',
+    name: 'Shop Experience',
+    description:
+      'Full e-commerce front-end with product display, cart management, order confirmation, and sales analytics.',
+    status: 'active',
+    author: 'alice@example.com',
+    createdAt: '2024-01-15T09:00:00Z',
+    modifiedAt: '2024-06-18T14:30:00Z',
+    extensionIds: [
+      'cmp-product-card',
+      'ctx-cart',
+      'fn-format-currency',
+      'api-products',
+      'wm-send-confirmation',
+      'ev-order-paid',
+      'dp-analytics',
+    ],
+    currentVersion: '2.1.0',
+    versions: [
+      {
+        id: 'v-shop-3',
+        version: '2.1.0',
+        label: 'Add loyalty points to order handler',
+        createdAt: '2024-06-18T14:30:00Z',
+        author: 'alice@example.com',
+        layers: {
+          liveSite: ['cmp-product-card', 'ctx-cart', 'fn-format-currency'],
+          dashboard: ['dp-analytics'],
+          code: ['api-products', 'wm-send-confirmation', 'ev-order-paid'],
+        },
+      },
+      {
+        id: 'v-shop-2',
+        version: '2.0.0',
+        label: 'Cart context refactor',
+        createdAt: '2024-04-02T10:00:00Z',
+        author: 'alice@example.com',
+        layers: {
+          liveSite: ['cmp-product-card', 'ctx-cart'],
+          dashboard: ['dp-analytics'],
+          code: ['api-products', 'wm-send-confirmation'],
+        },
+      },
+      {
+        id: 'v-shop-1',
+        version: '1.0.0',
+        label: 'Initial release',
+        createdAt: '2024-01-15T09:00:00Z',
+        author: 'alice@example.com',
+        layers: {
+          liveSite: ['cmp-product-card'],
+          dashboard: [],
+          code: ['api-products'],
+        },
+      },
+    ],
+  },
+  {
+    id: 'app-member',
+    name: 'Member Hub',
+    description:
+      'Member profile management, review widgets, and onboarding automation for registered users.',
+    status: 'active',
+    author: 'alice@example.com',
+    createdAt: '2024-02-20T11:00:00Z',
+    modifiedAt: '2024-06-10T09:15:00Z',
+    extensionIds: ['ctx-user', 'cmp-review-widget', 'fn-slugify', 'wm-update-member', 'ev-member-joined'],
+    currentVersion: '1.3.0',
+    versions: [
+      {
+        id: 'v-mem-2',
+        version: '1.3.0',
+        label: 'Profile slug support',
+        createdAt: '2024-06-10T09:15:00Z',
+        author: 'alice@example.com',
+        layers: {
+          liveSite: ['ctx-user', 'cmp-review-widget', 'fn-slugify'],
+          dashboard: [],
+          code: ['wm-update-member', 'ev-member-joined'],
+        },
+      },
+      {
+        id: 'v-mem-1',
+        version: '1.0.0',
+        label: 'Initial release',
+        createdAt: '2024-02-20T11:00:00Z',
+        author: 'alice@example.com',
+        layers: {
+          liveSite: ['ctx-user'],
+          dashboard: [],
+          code: ['wm-update-member', 'ev-member-joined'],
+        },
+      },
+    ],
+  },
+  {
+    id: 'app-dashboard',
+    name: 'Dashboard Suite',
+    description:
+      'Business intelligence with sales analytics, inventory management, and external webhook integrations.',
+    status: 'active',
+    author: 'bob@example.com',
+    createdAt: '2024-03-05T08:00:00Z',
+    modifiedAt: '2024-05-28T16:45:00Z',
+    extensionIds: ['dp-analytics', 'dp-inventory', 'api-products', 'api-webhook'],
+    currentVersion: '1.0.0',
+    versions: [
+      {
+        id: 'v-dash-1',
+        version: '1.0.0',
+        label: 'Initial release',
+        createdAt: '2024-03-05T08:00:00Z',
+        author: 'bob@example.com',
+        layers: {
+          liveSite: [],
+          dashboard: ['dp-analytics', 'dp-inventory'],
+          code: ['api-products', 'api-webhook'],
+        },
+      },
+    ],
+  },
+  {
+    id: 'app-landing',
+    name: 'Hero Landing',
+    description: 'Customizable hero section for marketing campaigns and seasonal promotions.',
+    status: 'draft',
+    author: 'alice@example.com',
+    createdAt: '2024-07-01T13:00:00Z',
+    modifiedAt: '2024-07-01T13:00:00Z',
+    extensionIds: ['cmp-hero-banner'],
+    currentVersion: '0.1.0',
+    versions: [
+      {
+        id: 'v-land-1',
+        version: '0.1.0',
+        label: 'Draft',
+        createdAt: '2024-07-01T13:00:00Z',
+        author: 'alice@example.com',
+        layers: {
+          liveSite: ['cmp-hero-banner'],
+          dashboard: [],
+          code: [],
+        },
+      },
+    ],
   },
 ];

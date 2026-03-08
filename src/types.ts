@@ -241,3 +241,37 @@ export const CATEGORY_TYPES: Record<ExtensionCategory, ExtensionType[]> = {
   backend: ['web-method', 'api', 'event-handler'],
   dashboard: ['dashboard-page'],
 };
+
+// ─── App / My Creations ──────────────────────────────────────────────────────
+
+export type AppStatus = 'active' | 'draft' | 'archived';
+
+export type ShareScope = 'account' | 'site' | 'community';
+
+export interface AppVersionLayers {
+  liveSite: string[];  // extension IDs — site category
+  dashboard: string[]; // extension IDs — dashboard category
+  code: string[];      // extension IDs — backend category (always present)
+}
+
+export interface AppVersion {
+  id: string;
+  version: string;  // semver e.g. "1.0.0"
+  label: string;
+  createdAt: string;
+  author: string;
+  layers: AppVersionLayers;
+}
+
+export interface CreatedApp {
+  id: string;
+  name: string;
+  description: string;
+  status: AppStatus;
+  author: string;
+  createdAt: string;
+  modifiedAt: string;
+  extensionIds: string[];
+  currentVersion: string;
+  versions: AppVersion[];
+}
