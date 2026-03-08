@@ -9,6 +9,7 @@ interface Props {
   onSelectApp: (app: CreatedApp) => void;
   onShareApp: (app: CreatedApp) => void;
   onDeleteApp: (app: CreatedApp) => void;
+  onNewApp?: () => void;
 }
 
 const STATUS_FILTERS: { value: AppStatus | 'all'; label: string }[] = [
@@ -24,6 +25,7 @@ const MyCreationsView: React.FC<Props> = ({
   onSelectApp,
   onShareApp,
   onDeleteApp,
+  onNewApp,
 }) => {
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<AppStatus | 'all'>('all');
@@ -53,6 +55,7 @@ const MyCreationsView: React.FC<Props> = ({
             </p>
           </div>
           <button
+            onClick={onNewApp}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-colors"
             style={{ background: '#116dff' }}
             onMouseEnter={e =>

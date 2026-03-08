@@ -8,7 +8,11 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-const WixTopBar: React.FC = () => (
+interface WixTopBarProps {
+  onToggleChat?: () => void;
+}
+
+const WixTopBar: React.FC<WixTopBarProps> = ({ onToggleChat }) => (
   <div
     className="flex items-center gap-3 px-4 flex-shrink-0 border-b"
     style={{ background: '#ffffff', borderColor: '#e5e8ef', height: 48, zIndex: 50 }}
@@ -131,6 +135,7 @@ const WixTopBar: React.FC = () => (
 
       {/* AI button */}
       <button
+        onClick={onToggleChat}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-colors"
         style={{ background: '#116dff' }}
         onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#0d5fdb')}

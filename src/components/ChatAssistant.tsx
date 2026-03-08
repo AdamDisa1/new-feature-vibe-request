@@ -9,6 +9,7 @@ import {
   Send,
   X,
   Bot,
+  LayoutGrid,
 } from 'lucide-react';
 
 interface Message {
@@ -23,8 +24,14 @@ const SUGGESTIONS = [
   'Plan my first offer',
 ];
 
-const ChatAssistant: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(true);
+interface ChatAssistantProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+  generateAppMode?: boolean;
+  onExitGenerateApp?: () => void;
+}
+
+const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -36,6 +43,17 @@ const ChatAssistant: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Activate Generate App mode
+  useEffect(() => {
+    if (generateAppMode) {
+      setMessages([{
+        id: Math.random().toString(36).slice(2),
+        role: 'assistant',
+        content: 'What would you like me to build for you today?',
+      }]);
+    }
+  }, [generateAppMode]);
 
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
@@ -80,15 +98,7 @@ const ChatAssistant: React.FC = () => {
   };
 
   if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 z-50"
-        style={{ background: '#1a1a2e' }}
-      >
-        <Bot size={22} color="#fff" />
-      </button>
-    );
+    return null;
   }
 
   return (
@@ -126,7 +136,7 @@ const ChatAssistant: React.FC = () => {
             </button>
           ))}
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={onClose}
             className="p-1.5 rounded-md transition-colors ml-1"
             style={{ color: '#6b7280' }}
             onMouseEnter={e =>
@@ -267,7 +277,7 @@ const ChatAssistant: React.FC = () => {
       {/* ── Input area ────────────────────────────────── */}
       <div className="flex-shrink-0 px-4 pb-3 pt-2">
         <div
-          className="flex items-center gap-2 rounded-xl px-3 py-2"
+          className="flex flex-col gap-2 rounded-xl px-3 py-2"
           style={{ border: '1px solid #e5e8ef', background: '#ffffff' }}
         >
           <input
@@ -276,44 +286,36 @@ const ChatAssistant: React.FC = () => {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask me anything"
+            placeholder={generateAppMode ? 'Describe your app...' : 'Ask me anything'}
             className="flex-1 text-sm outline-none bg-transparent"
             style={{ color: '#1a1a2e' }}
           />
-          <div className="flex items-center gap-0.5">
-            <button
-              className="p-1.5 rounded-md transition-colors"
-              style={{ color: '#6b7280' }}
-              onMouseEnter={e =>
-                ((e.currentTarget as HTMLButtonElement).style.color = '#1a1a2e')
-              }
-              onMouseLeave={e =>
-                ((e.currentTarget as HTMLButtonElement).style.color = '#6b7280')
-              }
-            >
-              <Plus size={16} />
-            </button>
-            <button
-              className="p-1.5 rounded-md transition-colors"
-              style={{ color: '#6b7280' }}
-              onMouseEnter={e =>
-                ((e.currentTarget as HTMLButtonElement).style.color = '#1a1a2e')
-              }
-              onMouseLeave={e =>
-                ((e.currentTarget as HTMLButtonElement).style.color = '#6b7280')
-              }
-            >
-              <Mic size={16} />
-            </button>
-            {input.trim() ? (
-              <button
-                onClick={() => sendMessage(input)}
-                className="p-1.5 rounded-md transition-colors"
-                style={{ color: '#116dff' }}
-              >
-                <Send size={16} />
-              </button>
-            ) : (
+          <div className="flex items-center justify-between">
+            {/* Mode chip */}
+            <div className="flex items-center">
+              {generateAppMode && (
+                <button
+                  onClick={onExitGenerateApp}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
+                  style={{
+                    background: '#f0e6ff',
+                    color: '#6b2fa0',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLButtonElement).style.background = '#e4d4fc';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLButtonElement).style.background = '#f0e6ff';
+                  }}
+                >
+                  <LayoutGrid size={12} />
+                  Generate App
+                  <X size={10} />
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-0.5">
               <button
                 className="p-1.5 rounded-md transition-colors"
                 style={{ color: '#6b7280' }}
@@ -324,9 +326,31 @@ const ChatAssistant: React.FC = () => {
                   ((e.currentTarget as HTMLButtonElement).style.color = '#6b7280')
                 }
               >
-                <AudioLines size={16} />
+                <Plus size={16} />
               </button>
-            )}
+              {input.trim() ? (
+                <button
+                  onClick={() => sendMessage(input)}
+                  className="p-1.5 rounded-md transition-colors"
+                  style={{ color: '#116dff' }}
+                >
+                  <Send size={16} />
+                </button>
+              ) : (
+                <button
+                  className="p-1.5 rounded-md transition-colors"
+                  style={{ color: '#6b7280' }}
+                  onMouseEnter={e =>
+                    ((e.currentTarget as HTMLButtonElement).style.color = '#1a1a2e')
+                  }
+                  onMouseLeave={e =>
+                    ((e.currentTarget as HTMLButtonElement).style.color = '#6b7280')
+                  }
+                >
+                  <AudioLines size={16} />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

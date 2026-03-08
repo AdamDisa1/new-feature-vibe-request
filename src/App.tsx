@@ -26,6 +26,8 @@ function App() {
   const [selectedAsset, setSelectedAsset] = useState<Extension | null>(null);
   const [sharingApp, setSharingApp] = useState<CreatedApp | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [generateAppMode, setGenerateAppMode] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(true);
 
   // Toasts
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -135,6 +137,7 @@ function App() {
           onSelectApp={app => { setSelectedApp(app); setSelectedAsset(null); }}
           onShareApp={setSharingApp}
           onDeleteApp={handleDeleteApp}
+          onNewApp={() => { setGenerateAppMode(true); setIsChatOpen(true); }}
         />
       );
     }
@@ -156,7 +159,7 @@ function App() {
   return (
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#f7f8fa' }}>
       {/* Top bar */}
-      <WixTopBar />
+      <WixTopBar onToggleChat={() => setIsChatOpen(prev => !prev)} />
 
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">
@@ -167,7 +170,12 @@ function App() {
         <main className="flex-1 overflow-hidden">{renderContent()}</main>
 
         {/* Chat Assistant */}
-        <ChatAssistant />
+        <ChatAssistant
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          generateAppMode={generateAppMode}
+          onExitGenerateApp={() => setGenerateAppMode(false)}
+        />
       </div>
 
       {/* Modals */}
