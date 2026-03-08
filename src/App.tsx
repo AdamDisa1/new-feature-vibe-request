@@ -9,6 +9,7 @@ import AppDetailPanel from './components/AppDetailPanel';
 import ShareModal from './components/ShareModal';
 import WixTopBar from './components/WixTopBar';
 import WixSidebar from './components/WixSidebar';
+import ChatAssistant from './components/ChatAssistant';
 
 type NavPage = 'home' | 'creations' | 'settings';
 
@@ -164,6 +165,9 @@ function App() {
 
         {/* Main */}
         <main className="flex-1 overflow-hidden">{renderContent()}</main>
+
+        {/* Chat Assistant */}
+        <ChatAssistant />
       </div>
 
       {/* Modals */}
