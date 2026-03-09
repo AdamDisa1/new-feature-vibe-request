@@ -1,4 +1,4 @@
-import { Extension, CreatedApp } from './types';
+import { Extension, CreatedApp, BackInStockProduct, BackInStockRequest } from './types';
 
 export const MOCK_EXTENSIONS: Extension[] = [
   // ─── Components ────────────────────────────────────────────────────────────
@@ -1236,6 +1236,108 @@ export default function InventoryManager() {
       },
     ],
     history: [],
+  },
+];
+
+// ─── Back In Stock Request Data ─────────────────────────────────────────────
+
+export const BACK_IN_STOCK_PRODUCTS: BackInStockProduct[] = [
+  { id: 'bis-p1', name: 'שרשרת התקווה של לואיס הר', color: '#c9a96e', initial: 'LH', totalRequests: 1842 },
+  { id: 'bis-p2', name: 'סיכת החופש', color: '#b0a090', initial: 'FP', totalRequests: 1205 },
+  { id: 'bis-p3', name: 'טבעת הנצח', color: '#116dff', initial: 'ER', totalRequests: 987 },
+  { id: 'bis-p4', name: 'צמיד האושר', color: '#00b383', initial: 'HB', totalRequests: 856 },
+  { id: 'bis-p5', name: 'עגילי הזהב', color: '#f59e0b', initial: 'GE', totalRequests: 712 },
+  { id: 'bis-p6', name: 'תליון הלב', color: '#7c6af5', initial: 'HP', totalRequests: 795 },
+];
+
+export const BACK_IN_STOCK_REQUESTS: BackInStockRequest[] = [
+  {
+    id: 'req-001',
+    productId: 'bis-p1',
+    productName: 'שרשרת התקווה של לואיס הר',
+    variant: 'פליז בציפוי זהב',
+    sku: 'HopeNLG',
+    requestDate: '2025-12-17T12:47:34Z',
+    customerEmail: 'nprizant3@gmail.com',
+    inventory: 'Out of stock',
+    status: 'Request Received',
+  },
+  {
+    id: 'req-002',
+    productId: 'bis-p2',
+    productName: 'סיכת החופש',
+    variant: 'לב | ציפוי זהב',
+    sku: 'Pin_Heart_...',
+    requestDate: '2025-12-16T21:00:53Z',
+    customerEmail: 'Cnlmarty@gmail.com',
+    inventory: 'Out of stock',
+    status: 'Request Received',
+  },
+  {
+    id: 'req-003',
+    productId: 'bis-p2',
+    productName: 'סיכת החופש',
+    variant: 'לב | כסף',
+    sku: 'Pin_Heart_...',
+    requestDate: '2025-12-16T20:59:31Z',
+    customerEmail: 'Cnlmarty@gmail.com',
+    inventory: 'Out of stock',
+    status: 'Request Received',
+  },
+  {
+    id: 'req-004',
+    productId: 'bis-p1',
+    productName: 'שרשרת התקווה של לואיס הר',
+    variant: 'פליז בציפוי זהב',
+    sku: 'HopeNLG',
+    requestDate: '2025-12-15T16:27:13Z',
+    customerEmail: 'jeremy.zakini@gma...',
+    inventory: 'Out of stock',
+    status: 'Request Received',
+  },
+  {
+    id: 'req-005',
+    productId: 'bis-p1',
+    productName: 'שרשרת התקווה של לואיס הר',
+    variant: 'פליז בציפוי זהב',
+    sku: 'HopeNLG',
+    requestDate: '2025-12-15T15:58:23Z',
+    customerEmail: 'Shakedkanovich@g...',
+    inventory: 'Out of stock',
+    status: 'Request Received',
+  },
+  {
+    id: 'req-006',
+    productId: 'bis-p3',
+    productName: 'טבעת הנצח',
+    variant: 'כסף | מידה 7',
+    sku: 'RING_ET_S7',
+    requestDate: '2025-12-14T10:30:00Z',
+    customerEmail: 'sarah.levi@gmail.com',
+    inventory: 'Out of stock',
+    status: 'Notified',
+  },
+  {
+    id: 'req-007',
+    productId: 'bis-p4',
+    productName: 'צמיד האושר',
+    variant: 'זהב | S',
+    sku: 'BRCLT_HP_S',
+    requestDate: '2025-12-13T08:15:00Z',
+    customerEmail: 'amit.gold@hotmail.com',
+    inventory: 'Out of stock',
+    status: 'Request Received',
+  },
+  {
+    id: 'req-008',
+    productId: 'bis-p5',
+    productName: 'עגילי הזהב',
+    variant: 'ציפוי זהב 14K',
+    sku: 'EARR_GLD',
+    requestDate: '2025-12-12T14:45:00Z',
+    customerEmail: 'noa.shapira@gmail.com',
+    inventory: 'Out of stock',
+    status: 'Purchased',
   },
 ];
 

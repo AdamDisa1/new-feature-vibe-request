@@ -51,9 +51,10 @@ interface ChatAssistantProps {
   onExitGenerateApp?: () => void;
   buildingMode?: BuildingModeState | null;
   onStartBuilding?: (optionLabel: string) => void;
+  onBuildComplete?: () => void;
 }
 
-const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, buildingMode, onStartBuilding }) => {
+const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, buildingMode, onStartBuilding, onBuildComplete }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -69,6 +70,8 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
   }, [messages]);
 
   // Building steps animation
+  const buildCompleteTimeoutRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (!buildingMode?.active) {
       setVisibleSteps(0);
@@ -81,11 +84,19 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
       setVisibleSteps(step);
       if (step >= BUILDING_STEPS.length) {
         clearInterval(interval);
+        buildCompleteTimeoutRef.current = window.setTimeout(() => {
+          onBuildComplete?.();
+        }, 1200);
       }
     }, 1800);
 
-    return () => clearInterval(interval);
-  }, [buildingMode?.active]);
+    return () => {
+      clearInterval(interval);
+      if (buildCompleteTimeoutRef.current) {
+        clearTimeout(buildCompleteTimeoutRef.current);
+      }
+    };
+  }, [buildingMode?.active, onBuildComplete]);
 
   // Scroll to bottom when building steps update
   useEffect(() => {
@@ -507,6 +518,11 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                       );
                     })}
                   </div>
+                  {visibleSteps >= BUILDING_STEPS.length && buildingMode?.completed && (
+                    <p className="text-[13px] font-medium mt-3 fade-in-up" style={{ color: '#00b383' }}>
+                      Your dashboard is ready!
+                    </p>
+                  )}
                 </div>
               </div>
             )}

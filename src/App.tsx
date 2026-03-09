@@ -17,6 +17,7 @@ type NavPage = 'home' | 'creations' | 'settings';
 export interface BuildingModeState {
   active: boolean;
   appName: string;
+  completed: boolean;
 }
 
 function App() {
@@ -56,7 +57,12 @@ function App() {
     setBuildingMode({
       active: true,
       appName: 'Back In Stock Analytics',
+      completed: false,
     });
+  }, []);
+
+  const handleBuildComplete = useCallback(() => {
+    setBuildingMode(prev => prev ? { ...prev, completed: true } : prev);
   }, []);
 
   // ── App handlers ─────────────────────────────────────────────────────────
@@ -107,7 +113,7 @@ function App() {
   const renderContent = () => {
     // Building mode: show skeleton dashboard
     if (buildingMode?.active) {
-      return <BuildingDashboardPage appName={buildingMode.appName} />;
+      return <BuildingDashboardPage appName={buildingMode.appName} completed={buildingMode.completed} />;
     }
 
     if (currentPage === 'creations') {
@@ -197,6 +203,7 @@ function App() {
           onExitGenerateApp={() => setGenerateAppMode(false)}
           buildingMode={buildingMode}
           onStartBuilding={handleStartBuilding}
+          onBuildComplete={handleBuildComplete}
         />
       </div>
 

@@ -242,6 +242,28 @@ export const CATEGORY_TYPES: Record<ExtensionCategory, ExtensionType[]> = {
   dashboard: ['dashboard-page'],
 };
 
+// ─── Back In Stock ───────────────────────────────────────────────────────────
+
+export interface BackInStockProduct {
+  id: string;
+  name: string;
+  color: string;
+  initial: string;
+  totalRequests: number;
+}
+
+export interface BackInStockRequest {
+  id: string;
+  productId: string;
+  productName: string;
+  variant: string;
+  sku: string;
+  requestDate: string;
+  customerEmail: string;
+  inventory: 'Out of stock' | 'In stock' | 'Low stock';
+  status: 'Request Received' | 'Notified' | 'Purchased';
+}
+
 // ─── App / My Creations ──────────────────────────────────────────────────────
 
 export type AppStatus = 'active' | 'draft' | 'archived';
