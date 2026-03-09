@@ -50,6 +50,10 @@ const MyCreationsView: React.FC<Props> = ({
             </h1>
             <p className="text-sm mt-1" style={{ color: '#6b7280' }}>
               Built by you, powered by AI
+              My Creations
+            </h1>
+            <p className="text-sm mt-1" style={{ color: '#6b7280' }}>
+              Built by you, powered by AI
             </p>
           </div>
           <button

@@ -251,6 +251,7 @@ const AppDetailPanel: React.FC<Props> = ({
           >
             <ArrowLeft size={13} />
             My Creations
+            My Creations
           </button>
 
           <div className="w-px h-4 flex-shrink-0" style={{ background: '#e5e8ef' }} />
