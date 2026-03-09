@@ -65,6 +65,12 @@ function App() {
     setBuildingMode(prev => prev ? { ...prev, completed: true } : prev);
   }, []);
 
+  const handleNavigateToDashboard = useCallback(() => {
+    setBuildingMode({ active: true, appName: 'Back In Stock Analytics', completed: true });
+    setSelectedApp(null);
+    setSelectedAsset(null);
+  }, []);
+
   // ── App handlers ─────────────────────────────────────────────────────────
 
   const handleRollback = useCallback(
@@ -204,6 +210,7 @@ function App() {
           buildingMode={buildingMode}
           onStartBuilding={handleStartBuilding}
           onBuildComplete={handleBuildComplete}
+          onNavigateToDashboard={handleNavigateToDashboard}
         />
       </div>
 

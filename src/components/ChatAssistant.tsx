@@ -52,14 +52,17 @@ interface ChatAssistantProps {
   buildingMode?: BuildingModeState | null;
   onStartBuilding?: (optionLabel: string) => void;
   onBuildComplete?: () => void;
+  onNavigateToDashboard?: () => void;
 }
 
-const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, buildingMode, onStartBuilding, onBuildComplete }) => {
+const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [visibleSteps, setVisibleSteps] = useState(0);
+  const [buildCompleted, setBuildCompleted] = useState(false);
+  const [buildAppName, setBuildAppName] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -74,9 +77,12 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
 
   useEffect(() => {
     if (!buildingMode?.active) {
-      setVisibleSteps(0);
       return;
     }
+
+    setBuildAppName(buildingMode.appName);
+    setBuildCompleted(false);
+    setVisibleSteps(0);
 
     let step = 0;
     const interval = setInterval(() => {
@@ -85,6 +91,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
       if (step >= BUILDING_STEPS.length) {
         clearInterval(interval);
         buildCompleteTimeoutRef.current = window.setTimeout(() => {
+          setBuildCompleted(true);
           onBuildComplete?.();
         }, 1200);
       }
@@ -467,7 +474,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
             )}
 
             {/* Building progress */}
-            {buildingMode?.active && (
+            {(buildingMode?.active || buildCompleted) && visibleSteps > 0 && (
               <div className="flex justify-start fade-in-up">
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mr-2 mt-0.5"
@@ -481,7 +488,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                   </div>
                   <p className="text-[13px] font-medium mb-3" style={{ color: '#1a1a2e' }}>
                     Starting the build process for your{' '}
-                    <span style={{ color: '#116dff' }}>{buildingMode.appName}</span>...
+                    <span style={{ color: '#116dff' }}>{buildAppName}</span>...
                   </p>
                   <div className="flex flex-col gap-2.5">
                     {BUILDING_STEPS.map((step, i) => {
@@ -518,11 +525,68 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                       );
                     })}
                   </div>
-                  {visibleSteps >= BUILDING_STEPS.length && buildingMode?.completed && (
+                  {visibleSteps >= BUILDING_STEPS.length && buildCompleted && (
                     <p className="text-[13px] font-medium mt-3 fade-in-up" style={{ color: '#00b383' }}>
-                      Your dashboard is ready!
+                      Your{' '}
+                      <span
+                        onClick={onNavigateToDashboard}
+                        className="cursor-pointer"
+                        style={{ color: '#116dff', textDecoration: 'underline', textUnderlineOffset: 2 }}
+                        onMouseEnter={e => ((e.currentTarget as HTMLSpanElement).style.color = '#0d5fdb')}
+                        onMouseLeave={e => ((e.currentTarget as HTMLSpanElement).style.color = '#116dff')}
+                      >
+                        dashboard
+                      </span>{' '}
+                      is ready!
                     </p>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* Next Step widget */}
+            {buildCompleted && visibleSteps >= BUILDING_STEPS.length && (
+              <div className="fade-in-up mt-1" style={{ animationDelay: '200ms' }}>
+                <div
+                  className="rounded-xl overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(160deg, #fdfcfb 0%, #f7f4f0 100%)',
+                    border: '1px solid #e8e4df',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div className="px-4 pt-3.5 pb-2">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <Sparkles size={13} style={{ color: '#116dff' }} />
+                      <span className="text-[13px] font-semibold" style={{ color: '#1a1a2e' }}>
+                        Next Step
+                      </span>
+                    </div>
+                    <p className="text-[12px]" style={{ color: '#6b7280' }}>
+                      Would you like to keep editing?
+                    </p>
+                  </div>
+                  <div className="px-4 pb-3.5 pt-1.5">
+                    <button
+                      onClick={onNavigateToDashboard}
+                      className="w-full py-2 rounded-lg text-[13px] font-semibold transition-colors"
+                      style={{
+                        color: '#116dff',
+                        background: '#ffffff',
+                        border: '1.5px solid #d0dbf0',
+                      }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLButtonElement).style.background = '#f0f5ff';
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = '#116dff';
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLButtonElement).style.background = '#ffffff';
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = '#d0dbf0';
+                      }}
+                    >
+                      Keep Editing
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
