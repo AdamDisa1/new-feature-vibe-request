@@ -257,6 +257,7 @@ function App() {
           onStartBuilding={handleStartBuilding}
           onBuildComplete={handleBuildComplete}
           onNavigateToDashboard={handleNavigateToDashboard}
+          onGoToCreations={() => handleNav('creations')}
         />
       </div>
 

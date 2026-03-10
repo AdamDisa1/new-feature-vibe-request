@@ -70,9 +70,10 @@ interface ChatAssistantProps {
   onStartBuilding?: (optionLabel: string) => void;
   onBuildComplete?: () => void;
   onNavigateToDashboard?: () => void;
+  onGoToCreations?: () => void;
 }
 
-const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, onEnterGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard }) => {
+const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, onEnterGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard, onGoToCreations }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -724,7 +725,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                       Would you like to keep editing?
                     </p>
                   </div>
-                  <div className="px-4 pb-3.5 pt-1.5">
+                  <div className="px-4 pb-3.5 pt-1.5 flex flex-col gap-2">
                     <button
                       onClick={onNavigateToDashboard}
                       className="w-full py-2 rounded-lg text-[13px] font-semibold transition-colors"
@@ -744,6 +745,28 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                     >
                       Keep Editing
                     </button>
+                    <button
+                      onClick={onGoToCreations}
+                      className="w-full py-2 rounded-lg text-[13px] font-semibold transition-colors"
+                      style={{
+                        color: '#6b7280',
+                        background: '#ffffff',
+                        border: '1.5px solid #e5e8ef',
+                      }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLButtonElement).style.background = '#f7f8fa';
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = '#9098a9';
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLButtonElement).style.background = '#ffffff';
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = '#e5e8ef';
+                      }}
+                    >
+                      Go to My Creations
+                    </button>
+                    <p className="text-[11px] text-center" style={{ color: '#9098a9' }}>
+                      You can manage and edit this dashboard anytime from the My Creations page.
+                    </p>
                   </div>
                 </div>
               </div>
