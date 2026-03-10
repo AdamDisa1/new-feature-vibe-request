@@ -98,6 +98,14 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
       return;
     }
 
+    // If already completed (returning to dashboard), restore final state without replaying
+    if (buildingMode.completed) {
+      setBuildAppName(buildingMode.appName);
+      setBuildCompleted(true);
+      setVisibleSteps(BUILDING_STEPS.length);
+      return;
+    }
+
     setBuildAppName(buildingMode.appName);
     setBuildCompleted(false);
     setVisibleSteps(0);
@@ -121,7 +129,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
         clearTimeout(buildCompleteTimeoutRef.current);
       }
     };
-  }, [buildingMode?.active, onBuildComplete]);
+  }, [buildingMode?.active, buildingMode?.completed, onBuildComplete]);
 
   // Scroll to bottom when building steps update
   useEffect(() => {
