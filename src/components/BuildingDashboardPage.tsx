@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Star, ChevronLeft, MoreHorizontal } from 'lucide-react';
+import { Star, ChevronLeft, MoreHorizontal, Sparkles } from 'lucide-react';
 import { BACK_IN_STOCK_PRODUCTS, BACK_IN_STOCK_REQUESTS } from '../mock-data';
 import { formatDateTime } from '../utils/dateUtils';
 
 interface BuildingDashboardPageProps {
   appName: string;
   completed: boolean;
+  freshlyBuilt: boolean;
 }
 
 // ─── Status badge styles ────────────────────────────────────────────────────
@@ -175,8 +176,16 @@ const RequestsTable: React.FC = () => {
 
 // ─── Back In Stock Dashboard ────────────────────────────────────────────────
 
-const BackInStockDashboard: React.FC = () => {
+const BackInStockDashboard: React.FC<{ freshlyBuilt: boolean }> = ({ freshlyBuilt }) => {
   const [activeTab, setActiveTab] = useState<'requests' | 'automations'>('requests');
+  const [showBuiltByAI, setShowBuiltByAI] = useState(freshlyBuilt);
+
+  useEffect(() => {
+    if (freshlyBuilt) {
+      const timeout = setTimeout(() => setShowBuiltByAI(false), 4000);
+      return () => clearTimeout(timeout);
+    }
+  }, [freshlyBuilt]);
 
   return (
     <div className="dashboard-reveal" style={{ padding: 32 }}>
@@ -239,7 +248,27 @@ const BackInStockDashboard: React.FC = () => {
       {/* Product Summary Widget */}
       {activeTab === 'requests' && (
         <>
-          <ProductSummaryWidget />
+          <div className="relative">
+            {showBuiltByAI && (
+              <div className="built-by-ai-banner">
+                <div
+                  className="flex items-center gap-2"
+                  style={{
+                    background: 'linear-gradient(135deg, #7c6af5, #9b59b6)',
+                    padding: '8px 18px',
+                    borderRadius: 999,
+                    boxShadow: '0 4px 20px rgba(124, 106, 245, 0.35)',
+                  }}
+                >
+                  <Sparkles size={14} color="#fff" />
+                  <span style={{ color: '#ffffff', fontSize: 13, fontWeight: 600 }}>
+                    Built by AI
+                  </span>
+                </div>
+              </div>
+            )}
+            <ProductSummaryWidget />
+          </div>
           <RequestsTable />
         </>
       )}
@@ -257,7 +286,7 @@ const BackInStockDashboard: React.FC = () => {
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
-const BuildingDashboardPage: React.FC<BuildingDashboardPageProps> = ({ appName, completed }) => {
+const BuildingDashboardPage: React.FC<BuildingDashboardPageProps> = ({ appName, completed, freshlyBuilt }) => {
   const [showDashboard, setShowDashboard] = useState(false);
 
   useEffect(() => {
@@ -292,7 +321,7 @@ const BuildingDashboardPage: React.FC<BuildingDashboardPageProps> = ({ appName, 
       {/* Content area */}
       <div className="flex-1 overflow-y-auto">
         {showDashboard ? (
-          <BackInStockDashboard />
+          <BackInStockDashboard freshlyBuilt={freshlyBuilt} />
         ) : (
           <div className="p-8">
             {/* Top bar placeholders */}

@@ -18,6 +18,7 @@ export interface BuildingModeState {
   active: boolean;
   appName: string;
   completed: boolean;
+  freshlyBuilt: boolean;
 }
 
 function App() {
@@ -59,11 +60,12 @@ function App() {
       active: true,
       appName: 'Back In Stock Analytics',
       completed: false,
+      freshlyBuilt: false,
     });
   }, []);
 
   const handleBuildComplete = useCallback(() => {
-    setBuildingMode(prev => prev ? { ...prev, completed: true } : prev);
+    setBuildingMode(prev => prev ? { ...prev, completed: true, freshlyBuilt: true } : prev);
 
     // Add the new creation to My Creations (only if not already there)
     setApps(prev => {
@@ -100,7 +102,7 @@ function App() {
   }, []);
 
   const handleNavigateToDashboard = useCallback(() => {
-    setBuildingMode({ active: true, appName: 'Back In Stock Analytics', completed: true });
+    setBuildingMode({ active: true, appName: 'Back In Stock Analytics', completed: true, freshlyBuilt: false });
     setSelectedApp(null);
     setSelectedAsset(null);
   }, []);
@@ -159,7 +161,7 @@ function App() {
   const renderContent = () => {
     // Building mode: show skeleton dashboard
     if (buildingMode?.active) {
-      return <BuildingDashboardPage appName={buildingMode.appName} completed={buildingMode.completed} />;
+      return <BuildingDashboardPage appName={buildingMode.appName} completed={buildingMode.completed} freshlyBuilt={buildingMode.freshlyBuilt} />;
     }
 
     if (currentPage === 'creations') {

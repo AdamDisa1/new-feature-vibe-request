@@ -102,6 +102,25 @@ body {
   animation: dashboardReveal 0.5s ease-out;
 }
 
+/* Built by AI banner animation */
+@keyframes builtByAiFadeInOut {
+  0% { opacity: 0; transform: translateY(6px); }
+  12% { opacity: 1; transform: translateY(0); }
+  75% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+.built-by-ai-banner {
+  position: absolute;
+  top: -14px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+  animation: builtByAiFadeInOut 4s ease-in-out forwards;
+}
+
 /* Code block */
 pre code {
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace !important;
