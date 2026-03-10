@@ -248,6 +248,7 @@ function App() {
           onClose={() => setIsChatOpen(false)}
           generateAppMode={generateAppMode}
           onExitGenerateApp={() => setGenerateAppMode(false)}
+          onEnterGenerateApp={() => { setGenerateAppMode(true); setEditAppMode(null); }}
           editAppMode={editAppMode}
           onExitEditApp={() => setEditAppMode(null)}
           buildingMode={buildingMode}

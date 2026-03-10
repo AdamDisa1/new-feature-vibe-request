@@ -13,6 +13,10 @@ import {
   CheckCircle2,
   Loader2,
   Pencil,
+  ShoppingCart,
+  Star,
+  Wand2,
+  CheckCircle,
 } from 'lucide-react';
 import { BuildingModeState } from '../App';
 
@@ -26,11 +30,20 @@ interface Widget {
   options: RadioOption[];
 }
 
+interface AppMarketCard {
+  name: string;
+  description: string;
+  iconBg: string;
+  rating: number;
+  isFree: boolean;
+}
+
 interface Message {
   id: string;
   role: 'assistant' | 'user';
   content: string;
   widget?: Widget;
+  appMarketCards?: AppMarketCard[];
 }
 
 const SUGGESTIONS = [
@@ -50,6 +63,7 @@ interface ChatAssistantProps {
   onClose?: () => void;
   generateAppMode?: boolean;
   onExitGenerateApp?: () => void;
+  onEnterGenerateApp?: () => void;
   editAppMode?: string | null;
   onExitEditApp?: () => void;
   buildingMode?: BuildingModeState | null;
@@ -58,7 +72,7 @@ interface ChatAssistantProps {
   onNavigateToDashboard?: () => void;
 }
 
-const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard }) => {
+const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, onEnterGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -202,6 +216,25 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
         role: 'assistant',
         content: "A great first offer could be a limited-time discount or free shipping. Head to Marketing > Coupons to create one. Would you like help crafting the perfect offer?",
       };
+
+    // Fee / charge / checkout scenario — suggest App Market + Build Custom
+    if (lower.includes('fee') || (lower.includes('charge') && lower.includes('order')) || lower.includes('checkout fee')) {
+      return {
+        id: Math.random().toString(36).slice(2),
+        role: 'assistant',
+        content: 'Here are tools that can help you manage custom requirements for your products. You can install an app from the Wix App Market or build a custom tool tailored exactly to your needs using AI.',
+        appMarketCards: [
+          {
+            name: 'Wix Checkout Requirements',
+            description: 'Set criteria for accepting orders on your store',
+            iconBg: '#3b82f6',
+            rating: 2.4,
+            isFree: true,
+          },
+        ],
+      };
+    }
+
     return {
       id: Math.random().toString(36).slice(2),
       role: 'assistant',
@@ -312,6 +345,115 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
             </p>
           </div>
         )}
+      </div>
+    );
+  };
+
+  const renderAppMarketWidget = (msg: Message) => {
+    if (!msg.appMarketCards || msg.appMarketCards.length === 0) return null;
+
+    return (
+      <div className="mt-3 flex flex-col gap-2.5">
+        {/* App Market cards */}
+        {msg.appMarketCards.map((card, i) => (
+          <div
+            key={i}
+            className="rounded-xl overflow-hidden transition-all"
+            style={{
+              background: '#f7f8fa',
+              border: '1px solid #e5e8ef',
+            }}
+          >
+            <div className="px-3.5 py-3 flex items-center gap-3">
+              {/* App icon */}
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 relative"
+                style={{ background: card.iconBg }}
+              >
+                <ShoppingCart size={20} color="#fff" />
+                <div
+                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
+                  style={{ background: '#ffffff', border: '1.5px solid #e5e8ef' }}
+                >
+                  <CheckCircle size={10} style={{ color: '#00b383' }} />
+                </div>
+              </div>
+              {/* App info */}
+              <div className="flex-1 min-w-0">
+                <h4 className="text-[13px] font-semibold truncate" style={{ color: '#1a1a2e' }}>
+                  {card.name}
+                </h4>
+                <p className="text-[11px] mt-0.5 truncate" style={{ color: '#6b7280' }}>
+                  {card.description}
+                </p>
+              </div>
+            </div>
+            <div
+              className="px-3.5 py-2 flex items-center justify-between"
+              style={{ borderTop: '1px solid #e5e8ef', background: '#ffffff' }}
+            >
+              <span className="text-[11px]" style={{ color: '#6b7280' }}>
+                {card.isFree ? 'Free to install' : 'Paid'}
+              </span>
+              <div className="flex items-center gap-1">
+                <Star size={12} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+                <span className="text-[12px] font-semibold" style={{ color: '#1a1a2e' }}>
+                  {card.rating}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Build Custom Tool with AI card */}
+        <div
+          className="rounded-xl overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            boxShadow: '0 4px 14px rgba(102, 126, 234, 0.3)',
+          }}
+        >
+          <div className="px-4 pt-4 pb-2">
+            <div className="flex items-center gap-2 mb-2">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ background: 'rgba(255,255,255,0.2)' }}
+              >
+                <Wand2 size={16} color="#fff" />
+              </div>
+              <h4 className="text-[13px] font-bold" style={{ color: '#ffffff' }}>
+                Build Custom Tool with AI
+              </h4>
+            </div>
+            <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              Create a tailored solution that fits your exact needs
+            </p>
+          </div>
+          <div className="px-4 pb-3.5 pt-1.5">
+            <button
+              onClick={onEnterGenerateApp}
+              className="w-full py-2 rounded-lg text-[12px] font-semibold transition-all"
+              style={{
+                color: '#ffffff',
+                background: 'rgba(255,255,255,0.18)',
+                border: '1.5px solid rgba(255,255,255,0.4)',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.3)';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.7)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.18)';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.4)';
+              }}
+            >
+              <span className="flex items-center justify-center gap-1.5">
+                <Sparkles size={13} />
+                Start Building
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
     );
   };
@@ -463,6 +605,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                     {msg.content}
                   </div>
                   {msg.role === 'assistant' && renderWidget(msg)}
+                  {msg.role === 'assistant' && renderAppMarketWidget(msg)}
                 </div>
               </div>
             ))}
