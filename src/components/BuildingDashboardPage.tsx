@@ -248,23 +248,11 @@ const BackInStockDashboard: React.FC<{ freshlyBuilt: boolean }> = ({ freshlyBuil
       {/* Product Summary Widget */}
       {activeTab === 'requests' && (
         <>
-          <div className="relative">
+          <div className={`relative ${showBuiltByAI ? 'ai-gradient-frame' : ''}`}>
             {showBuiltByAI && (
-              <div className="built-by-ai-banner">
-                <div
-                  className="flex items-center gap-2"
-                  style={{
-                    background: 'linear-gradient(135deg, #7c6af5, #9b59b6)',
-                    padding: '8px 18px',
-                    borderRadius: 999,
-                    boxShadow: '0 4px 20px rgba(124, 106, 245, 0.35)',
-                  }}
-                >
-                  <Sparkles size={14} color="#fff" />
-                  <span style={{ color: '#ffffff', fontSize: 13, fontWeight: 600 }}>
-                    Built by AI
-                  </span>
-                </div>
+              <div className="ai-frame-label">
+                <Sparkles size={12} color="#fff" />
+                <span>Built by AI</span>
               </div>
             )}
             <ProductSummaryWidget />

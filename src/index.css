@@ -102,23 +102,48 @@ body {
   animation: dashboardReveal 0.5s ease-out;
 }
 
-/* Built by AI banner animation */
-@keyframes builtByAiFadeInOut {
-  0% { opacity: 0; transform: translateY(6px); }
-  12% { opacity: 1; transform: translateY(0); }
-  75% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-4px); }
+/* Built by AI — animated gradient frame */
+.ai-gradient-frame {
+  position: relative;
+  border-radius: 16px;
+  border: 3px solid transparent;
+  background:
+    linear-gradient(#f7f8fa, #f7f8fa) padding-box,
+    linear-gradient(135deg, #4facfe, #00f2fe, #43e97b, #4facfe) border-box;
+  background-size: 100% 100%, 300% 300%;
+  padding: 10px;
+  animation: gradientShift 2s ease infinite, frameFadeInOut 4s ease-in-out forwards;
 }
-.built-by-ai-banner {
+
+@keyframes gradientShift {
+  0%   { background-position: 100% 100%, 0% 50%; }
+  50%  { background-position: 100% 100%, 100% 50%; }
+  100% { background-position: 100% 100%, 0% 50%; }
+}
+
+@keyframes frameFadeInOut {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.ai-frame-label {
   position: absolute;
-  top: -14px;
-  left: 0;
-  right: 0;
+  top: -10px;
+  right: 16px;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
   z-index: 10;
   pointer-events: none;
-  animation: builtByAiFadeInOut 4s ease-in-out forwards;
+  box-shadow: 0 2px 8px rgba(79, 172, 254, 0.4);
 }
 
 /* Code block */
