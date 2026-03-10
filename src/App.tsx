@@ -64,6 +64,39 @@ function App() {
 
   const handleBuildComplete = useCallback(() => {
     setBuildingMode(prev => prev ? { ...prev, completed: true } : prev);
+
+    // Add the new creation to My Creations (only if not already there)
+    setApps(prev => {
+      if (prev.some(a => a.id === 'app-bis-aggregation')) return prev;
+      const now = new Date().toISOString();
+      const newApp: CreatedApp = {
+        id: 'app-bis-aggregation',
+        name: 'Back In Stock Requests Aggregation',
+        description:
+          'Aggregated dashboard for back-in-stock requests showing product-level analytics, request trends, and customer notifications.',
+        status: 'active',
+        author: 'alice@example.com',
+        createdAt: now,
+        modifiedAt: now,
+        extensionIds: ['dp-analytics'],
+        currentVersion: '1.0.0',
+        versions: [
+          {
+            id: 'v-bis-1',
+            version: '1.0.0',
+            label: 'Initial AI-generated dashboard',
+            createdAt: now,
+            author: 'Aria AI',
+            layers: {
+              liveSite: [],
+              dashboard: ['dp-analytics'],
+              code: [],
+            },
+          },
+        ],
+      };
+      return [newApp, ...prev];
+    });
   }, []);
 
   const handleNavigateToDashboard = useCallback(() => {
