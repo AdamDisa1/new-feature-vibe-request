@@ -10,6 +10,7 @@ interface Props {
   onShareApp: (app: CreatedApp) => void;
   onDeleteApp: (app: CreatedApp) => void;
   onNewApp?: () => void;
+  onEditWithAI?: (app: CreatedApp) => void;
 }
 
 const STATUS_FILTERS: { value: AppStatus | 'all'; label: string }[] = [
@@ -26,6 +27,7 @@ const MyCreationsView: React.FC<Props> = ({
   onShareApp,
   onDeleteApp,
   onNewApp,
+  onEditWithAI,
 }) => {
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<AppStatus | 'all'>('all');
@@ -151,6 +153,7 @@ const MyCreationsView: React.FC<Props> = ({
                 onSelect={() => onSelectApp(app)}
                 onShare={() => onShareApp(app)}
                 onDelete={() => onDeleteApp(app)}
+                onEditWithAI={() => onEditWithAI?.(app)}
               />
             ))}
           </div>

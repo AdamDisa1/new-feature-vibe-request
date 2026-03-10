@@ -12,6 +12,7 @@ import {
   Sparkles,
   CheckCircle2,
   Loader2,
+  Pencil,
 } from 'lucide-react';
 import { BuildingModeState } from '../App';
 
@@ -49,13 +50,15 @@ interface ChatAssistantProps {
   onClose?: () => void;
   generateAppMode?: boolean;
   onExitGenerateApp?: () => void;
+  editAppMode?: string | null;
+  onExitEditApp?: () => void;
   buildingMode?: BuildingModeState | null;
   onStartBuilding?: (optionLabel: string) => void;
   onBuildComplete?: () => void;
   onNavigateToDashboard?: () => void;
 }
 
-const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard }) => {
+const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -123,6 +126,18 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
       setSelectedOptions({});
     }
   }, [generateAppMode]);
+
+  // Activate Edit App mode
+  useEffect(() => {
+    if (editAppMode) {
+      setMessages([{
+        id: Math.random().toString(36).slice(2),
+        role: 'assistant',
+        content: `What changes would you like to make to ${editAppMode}?`,
+      }]);
+      setSelectedOptions({});
+    }
+  }, [editAppMode]);
 
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
@@ -608,7 +623,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={generateAppMode ? 'Describe your app...' : 'Ask me anything'}
+            placeholder={generateAppMode ? 'Describe your app...' : editAppMode ? `Describe changes to ${editAppMode}...` : 'Ask me anything'}
             className="flex-1 text-sm outline-none bg-transparent"
             style={{ color: '#1a1a2e' }}
           />
@@ -632,6 +647,26 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                 >
                   <LayoutGrid size={12} />
                   New Creation
+                  <X size={10} />
+                </button>
+              )}
+              {editAppMode && (
+                <button
+                  onClick={onExitEditApp}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
+                  style={{
+                    background: '#f0eeff',
+                    color: '#7c6af5',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLButtonElement).style.background = '#e4dafb';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLButtonElement).style.background = '#f0eeff';
+                  }}
+                >
+                  <Pencil size={12} />
+                  Edit {editAppMode}
                   <X size={10} />
                 </button>
               )}

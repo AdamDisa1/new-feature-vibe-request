@@ -34,6 +34,7 @@ function App() {
   const [sharingApp, setSharingApp] = useState<CreatedApp | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [generateAppMode, setGenerateAppMode] = useState(false);
+  const [editAppMode, setEditAppMode] = useState<string | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [buildingMode, setBuildingMode] = useState<BuildingModeState | null>(null);
 
@@ -69,6 +70,12 @@ function App() {
     setBuildingMode({ active: true, appName: 'Back In Stock Analytics', completed: true });
     setSelectedApp(null);
     setSelectedAsset(null);
+  }, []);
+
+  const handleEditWithAI = useCallback((app: CreatedApp) => {
+    setEditAppMode(app.name);
+    setGenerateAppMode(false);
+    setIsChatOpen(true);
   }, []);
 
   // ── App handlers ─────────────────────────────────────────────────────────
@@ -169,7 +176,8 @@ function App() {
           onSelectApp={app => { setSelectedApp(app); setSelectedAsset(null); }}
           onShareApp={setSharingApp}
           onDeleteApp={handleDeleteApp}
-          onNewApp={() => { setGenerateAppMode(true); setIsChatOpen(true); }}
+          onNewApp={() => { setGenerateAppMode(true); setEditAppMode(null); setIsChatOpen(true); }}
+          onEditWithAI={handleEditWithAI}
         />
       );
     }
@@ -207,6 +215,8 @@ function App() {
           onClose={() => setIsChatOpen(false)}
           generateAppMode={generateAppMode}
           onExitGenerateApp={() => setGenerateAppMode(false)}
+          editAppMode={editAppMode}
+          onExitEditApp={() => setEditAppMode(null)}
           buildingMode={buildingMode}
           onStartBuilding={handleStartBuilding}
           onBuildComplete={handleBuildComplete}
