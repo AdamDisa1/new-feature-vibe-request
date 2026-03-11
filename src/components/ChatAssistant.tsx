@@ -416,51 +416,47 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
 
         {/* Build Custom Tool with AI card */}
         <div
-          className="rounded-xl overflow-hidden"
+          className="relative rounded-xl overflow-visible cursor-pointer transition-all"
           style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            boxShadow: '0 4px 14px rgba(102, 126, 234, 0.3)',
+            background: '#ffffff',
+            border: '1.5px solid #d8d0f0',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          }}
+          onClick={onEnterGenerateApp}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLDivElement).style.borderColor = '#7c6af5';
+            (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 12px rgba(124, 106, 245, 0.15)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLDivElement).style.borderColor = '#d8d0f0';
+            (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
           }}
         >
-          <div className="px-4 pt-4 pb-2">
-            <div className="flex items-center gap-2 mb-2">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: 'rgba(255,255,255,0.2)' }}
-              >
-                <Wand2 size={16} color="#fff" />
-              </div>
-              <h4 className="text-[13px] font-bold" style={{ color: '#ffffff' }}>
+          {/* Sparkles badge top-left */}
+          <div
+            className="absolute flex items-center justify-center"
+            style={{
+              top: -10,
+              left: -10,
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #7c6af5, #9b87f5)',
+              boxShadow: '0 2px 6px rgba(124, 106, 245, 0.35)',
+            }}
+          >
+            <Sparkles size={14} color="#fff" />
+          </div>
+          <div className="px-3.5 py-3 flex items-center gap-3">
+            {/* Text */}
+            <div className="flex-1 min-w-0">
+              <h4 className="text-[13px] font-semibold" style={{ color: '#1a1a2e' }}>
                 Build Custom Tool with AI
               </h4>
+              <p className="text-[11px] mt-0.5" style={{ color: '#6b7280' }}>
+                A tailored solution to match your needs
+              </p>
             </div>
-            <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>
-              Create a tailored solution that fits your exact needs
-            </p>
-          </div>
-          <div className="px-4 pb-3.5 pt-1.5">
-            <button
-              onClick={onEnterGenerateApp}
-              className="w-full py-2 rounded-lg text-[12px] font-semibold transition-all"
-              style={{
-                color: '#ffffff',
-                background: 'rgba(255,255,255,0.18)',
-                border: '1.5px solid rgba(255,255,255,0.4)',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.3)';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.7)';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.18)';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.4)';
-              }}
-            >
-              <span className="flex items-center justify-center gap-1.5">
-                <Sparkles size={13} />
-                Start Building
-              </span>
-            </button>
           </div>
         </div>
       </div>
@@ -698,10 +694,9 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                       style={{
                         background: '#f7f8fa',
                         border: '1px solid #e5e8ef',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                       }}
                     >
-                      <div className="px-4 pt-4 pb-3">
+                      <div className="px-3.5 py-3">
                         <p className="text-[13px] font-medium text-center" style={{ color: '#32325d' }}>
                           Your{' '}
                           <span
@@ -715,14 +710,17 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                           </span>{' '}
                           is ready!
                         </p>
-                        <p className="text-[12px] text-center mt-2" style={{ color: '#6b7280' }}>
+                        <p className="text-[11px] text-center mt-1" style={{ color: '#6b7280' }}>
                           You can continue editing it in chat and manage it in your custom creations
                         </p>
                       </div>
-                      <div className="px-4 pb-4">
+                      <div
+                        className="px-3.5 py-2"
+                        style={{ borderTop: '1px solid #e5e8ef', background: '#ffffff' }}
+                      >
                         <button
                           onClick={onGoToCreations}
-                          className="w-full py-2 rounded-lg text-[13px] font-semibold transition-colors"
+                          className="w-full py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
                           style={{
                             color: '#32325d',
                             background: '#ffffff',

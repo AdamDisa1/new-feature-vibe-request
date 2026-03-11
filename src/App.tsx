@@ -11,6 +11,7 @@ import WixTopBar from './components/WixTopBar';
 import WixSidebar from './components/WixSidebar';
 import ChatAssistant from './components/ChatAssistant';
 import BuildingDashboardPage from './components/BuildingDashboardPage';
+import HomePage from './components/HomePage';
 
 type NavPage = 'home' | 'creations' | 'settings';
 
@@ -217,6 +218,10 @@ function App() {
       );
     }
 
+    if (currentPage === 'home') {
+      return <HomePage />;
+    }
+
     // Placeholder pages
     return (
       <div
@@ -224,7 +229,7 @@ function App() {
         style={{ background: '#f7f8fa' }}
       >
         <p className="text-sm font-medium" style={{ color: '#32325d' }}>
-          {currentPage === 'home' ? 'Home' : 'Settings'}
+          Settings
         </p>
         <p className="text-xs" style={{ color: '#9098a9' }}>Coming soon</p>
       </div>
