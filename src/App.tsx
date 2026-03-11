@@ -39,6 +39,8 @@ function App() {
   const [editAppMode, setEditAppMode] = useState<string | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(true);
   const [buildingMode, setBuildingMode] = useState<BuildingModeState | null>(null);
+  const [showEmptyCreations, setShowEmptyCreations] = useState(false);
+  const [prefillChatInput, setPrefillChatInput] = useState('');
 
   // Toasts
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -111,6 +113,21 @@ function App() {
   const handleEditWithAI = useCallback((app: CreatedApp) => {
     setEditAppMode(app.name);
     setGenerateAppMode(false);
+    setIsChatOpen(true);
+  }, []);
+
+  const handleShowEmptyCreations = useCallback(() => {
+    setShowEmptyCreations(true);
+    setCurrentPage('creations');
+    setSelectedApp(null);
+    setSelectedAsset(null);
+    setBuildingMode(null);
+  }, []);
+
+  const handleSuggestionCardClick = useCallback((prompt: string) => {
+    setPrefillChatInput(prompt);
+    setGenerateAppMode(true);
+    setEditAppMode(null);
     setIsChatOpen(true);
   }, []);
 
@@ -214,6 +231,8 @@ function App() {
           onDeleteApp={handleDeleteApp}
           onNewApp={() => { setGenerateAppMode(true); setEditAppMode(null); setIsChatOpen(true); }}
           onEditWithAI={handleEditWithAI}
+          showEmptyState={showEmptyCreations}
+          onSuggestionClick={handleSuggestionCardClick}
         />
       );
     }
@@ -263,6 +282,9 @@ function App() {
           onBuildComplete={handleBuildComplete}
           onNavigateToDashboard={handleNavigateToDashboard}
           onGoToCreations={() => handleNav('creations')}
+          onShowEmptyCreations={handleShowEmptyCreations}
+          prefillInput={prefillChatInput}
+          onPrefillConsumed={() => setPrefillChatInput('')}
         />
       </div>
 

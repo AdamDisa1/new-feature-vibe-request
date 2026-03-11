@@ -71,9 +71,12 @@ interface ChatAssistantProps {
   onBuildComplete?: () => void;
   onNavigateToDashboard?: () => void;
   onGoToCreations?: () => void;
+  onShowEmptyCreations?: () => void;
+  prefillInput?: string;
+  onPrefillConsumed?: () => void;
 }
 
-const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, onEnterGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard, onGoToCreations }) => {
+const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, onEnterGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard, onGoToCreations, onShowEmptyCreations, prefillInput, onPrefillConsumed }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -162,6 +165,15 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
     }
   }, [editAppMode]);
 
+  // Prefill input from external source (e.g. suggestion card click)
+  useEffect(() => {
+    if (prefillInput) {
+      setInput(prefillInput);
+      onPrefillConsumed?.();
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [prefillInput, onPrefillConsumed]);
+
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
 
@@ -173,6 +185,21 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsTyping(true);
+
+    // Check for empty state trigger
+    if (text.trim().toLowerCase() === 'my creations empty state') {
+      setTimeout(() => {
+        onShowEmptyCreations?.();
+        const reply: Message = {
+          id: Math.random().toString(36).slice(2),
+          role: 'assistant',
+          content: 'Switching to the empty state view for My Creations. You can explore the suggested tools below!',
+        };
+        setMessages(prev => [...prev, reply]);
+        setIsTyping(false);
+      }, 800);
+      return;
+    }
 
     // Simulate assistant response
     setTimeout(() => {
