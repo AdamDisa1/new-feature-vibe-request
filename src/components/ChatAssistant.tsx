@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   MessageCircle,
   Clock,
@@ -28,6 +28,7 @@ interface RadioOption {
 interface Widget {
   question: string;
   options: RadioOption[];
+  appName?: string;
 }
 
 interface AppMarketCard {
@@ -52,10 +53,16 @@ const SUGGESTIONS = [
   'Plan my first offer',
 ];
 
-const BUILDING_STEPS = [
+const BUILDING_STEPS_STOCK = [
   'Adding aggregated requests field to Out Of Stock dashboard...',
   'Generating CMS collection for the aggregation...',
   'Defining data schema...',
+];
+
+const BUILDING_STEPS_UPSELL = [
+  'Analyzing frequently bought-together products...',
+  'Creating bundle recommendation engine...',
+  'Building upsell widget for product pages...',
 ];
 
 interface ChatAssistantProps {
@@ -67,7 +74,7 @@ interface ChatAssistantProps {
   editAppMode?: string | null;
   onExitEditApp?: () => void;
   buildingMode?: BuildingModeState | null;
-  onStartBuilding?: (optionLabel: string) => void;
+  onStartBuilding?: (optionLabel: string, appName?: string) => void;
   onBuildComplete?: () => void;
   onNavigateToDashboard?: () => void;
   onGoToCreations?: () => void;
@@ -85,6 +92,11 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
   const [buildCompleted, setBuildCompleted] = useState(false);
   const [buildAppName, setBuildAppName] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const buildingSteps = useMemo(() => {
+    if (buildingMode?.appName === 'Smart Product Bundles') return BUILDING_STEPS_UPSELL;
+    return BUILDING_STEPS_STOCK;
+  }, [buildingMode?.appName]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const hasConversation = messages.length > 0;
@@ -105,7 +117,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
     if (buildingMode.completed) {
       setBuildAppName(buildingMode.appName);
       setBuildCompleted(true);
-      setVisibleSteps(BUILDING_STEPS.length);
+      setVisibleSteps(buildingSteps.length);
       return;
     }
 
@@ -117,7 +129,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
     const interval = setInterval(() => {
       step++;
       setVisibleSteps(step);
-      if (step >= BUILDING_STEPS.length) {
+      if (step >= buildingSteps.length) {
         clearInterval(interval);
         buildCompleteTimeoutRef.current = window.setTimeout(() => {
           setBuildCompleted(true);
@@ -212,8 +224,31 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
   const getReply = (text: string): Message => {
     const lower = text.toLowerCase();
 
-    // Analytics + out-of-stock scenario
-    if (lower.includes('analytics') && (lower.includes('out-of-stock') || lower.includes('out of stock') || lower.includes('stock request'))) {
+    // Upsell / Bundle flow
+    if (lower.includes('upsell') || lower.includes('cross-sell') || lower.includes('cross sell') || lower.includes('bundle') || lower.includes('appsell') || lower.includes('app sell')) {
+      return {
+        id: Math.random().toString(36).slice(2),
+        role: 'assistant',
+        content: 'Great idea! I can help you set up product upsells and bundles.',
+        widget: {
+          question: 'How would you like to add upsell & bundle features?',
+          options: [
+            {
+              id: 'existing-pages',
+              label: 'Add upsell & bundle suggestions to existing product pages',
+            },
+            {
+              id: 'new-bundle-page',
+              label: 'Build a new Smart Bundle Creator page with cross-sell recommendations',
+            },
+          ],
+          appName: 'Smart Product Bundles',
+        },
+      };
+    }
+
+    // Analytics / out-of-stock scenario
+    if (lower.includes('analytics') || lower.includes('out-of-stock') || lower.includes('out of stock') || lower.includes('stock request')) {
       return {
         id: Math.random().toString(36).slice(2),
         role: 'assistant',
@@ -230,6 +265,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
               label: 'Build a new dashboard page to show aggregated requests per product, along with last month\'s sales per product',
             },
           ],
+          appName: 'Back In Stock Analytics',
         },
       };
     }
@@ -239,12 +275,6 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
         id: Math.random().toString(36).slice(2),
         role: 'assistant',
         content: "To get more visitors, I'd recommend starting with SEO basics — make sure your site title, descriptions, and content include keywords your audience searches for. You can also connect Google Search Console from your Marketing tools.",
-      };
-    if (lower.includes('analytics'))
-      return {
-        id: Math.random().toString(36).slice(2),
-        role: 'assistant',
-        content: "You can set up analytics by going to Analytics in the left sidebar. I recommend connecting Google Analytics for deeper insights. Want me to walk you through it?",
       };
     if (lower.includes('offer') || lower.includes('promotion'))
       return {
@@ -360,7 +390,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
               onClick={() => {
                 const option = msg.widget!.options.find(o => o.id === selected);
                 if (option) {
-                  onStartBuilding?.(option.label);
+                  onStartBuilding?.(option.label, msg.widget!.appName);
                 }
               }}
               className="w-full py-2 rounded-lg text-xs font-semibold text-white transition-colors"
@@ -681,10 +711,10 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                     <span style={{ color: '#116dff' }}>{buildAppName}</span>...
                   </p>
                   <div className="flex flex-col gap-2.5">
-                    {BUILDING_STEPS.map((step, i) => {
+                    {buildingSteps.map((step, i) => {
                       if (i >= visibleSteps) return null;
                       const isLastVisible = i === visibleSteps - 1;
-                      const allDone = visibleSteps >= BUILDING_STEPS.length;
+                      const allDone = visibleSteps >= buildingSteps.length;
                       const isComplete = !isLastVisible || allDone;
 
                       return (
@@ -715,7 +745,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                       );
                     })}
                   </div>
-                  {visibleSteps >= BUILDING_STEPS.length && buildCompleted && (
+                  {visibleSteps >= buildingSteps.length && buildCompleted && (
                     <div
                       className="mt-3 rounded-xl overflow-hidden fade-in-up"
                       style={{

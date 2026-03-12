@@ -58,10 +58,10 @@ function App() {
     setBuildingMode(null);
   };
 
-  const handleStartBuilding = useCallback((selectedOptionLabel: string) => {
+  const handleStartBuilding = useCallback((selectedOptionLabel: string, appName?: string) => {
     setBuildingMode({
       active: true,
-      appName: 'Back In Stock Analytics',
+      appName: appName || 'Back In Stock Analytics',
       completed: false,
       freshlyBuilt: false,
     });
