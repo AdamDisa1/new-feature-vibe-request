@@ -70,10 +70,10 @@ function AppInner() {
 
   // ── ChatAssistant build handlers ──────────────────────────────────────────
 
-  const handleStartBuilding = useCallback((selectedOptionLabel: string) => {
+  const handleStartBuilding = useCallback((selectedOptionLabel: string, appName?: string) => {
     setBuildingMode({
       active: true,
-      appName: 'Back In Stock Analytics',
+      appName: appName || 'Back In Stock Analytics',
       completed: false,
       freshlyBuilt: false,
     });
@@ -314,7 +314,7 @@ function AppInner() {
         {/* Main */}
         <main className="flex-1 overflow-hidden">{renderContent()}</main>
 
-        {/* Chat Assistant (ChatAssistant flow) */}
+        {/* Aria Chat — single unified chat for all flows */}
         <ChatAssistant
           isOpen={isChatOpen}
           onClose={() => setIsChatOpen(false)}

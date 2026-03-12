@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   MessageCircle,
   Clock,
@@ -30,6 +30,7 @@ interface RadioOption {
 interface Widget {
   question: string;
   options: RadioOption[];
+  appName?: string;
 }
 
 interface AppMarketCard {
@@ -46,6 +47,7 @@ interface Message {
   content: string;
   widget?: Widget;
   appMarketCards?: AppMarketCard[];
+  showUpsellCards?: boolean;
 }
 
 const SUGGESTIONS = [
@@ -62,6 +64,12 @@ const BUILDING_STEPS = [
   'Defining data schema...',
 ];
 
+const BUILDING_STEPS_UPSELL = [
+  'Analyzing frequently bought-together products...',
+  'Creating bundle recommendation engine...',
+  'Building upsell widget for product pages...',
+];
+
 interface ChatAssistantProps {
   isOpen?: boolean;
   onClose?: () => void;
@@ -71,7 +79,7 @@ interface ChatAssistantProps {
   editAppMode?: string | null;
   onExitEditApp?: () => void;
   buildingMode?: BuildingModeState | null;
-  onStartBuilding?: (optionLabel: string) => void;
+  onStartBuilding?: (optionLabel: string, appName?: string) => void;
   onBuildComplete?: () => void;
   onNavigateToDashboard?: () => void;
   onGoToCreations?: () => void;
@@ -92,6 +100,11 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
   const [buildAppName, setBuildAppName] = useState('');
   const [upsellFlowActive, setUpsellFlowActive] = useState(!!forceUpsellFlow);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const buildingSteps = useMemo(() => {
+    if (buildingMode?.appName === 'Smart Product Bundles') return BUILDING_STEPS_UPSELL;
+    return BUILDING_STEPS_STOCK;
+  }, [buildingMode?.appName]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Upsell context for flow activation
@@ -115,7 +128,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
     if (buildingMode.completed) {
       setBuildAppName(buildingMode.appName);
       setBuildCompleted(true);
-      setVisibleSteps(BUILDING_STEPS.length);
+      setVisibleSteps(buildingSteps.length);
       return;
     }
 
@@ -127,7 +140,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
     const interval = setInterval(() => {
       step++;
       setVisibleSteps(step);
-      if (step >= BUILDING_STEPS.length) {
+      if (step >= buildingSteps.length) {
         clearInterval(interval);
         buildCompleteTimeoutRef.current = window.setTimeout(() => {
           setBuildCompleted(true);
@@ -266,8 +279,18 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
   const getReply = (text: string): Message => {
     const lower = text.toLowerCase();
 
-    // Analytics + out-of-stock scenario
-    if (lower.includes('analytics') && (lower.includes('out-of-stock') || lower.includes('out of stock') || lower.includes('stock request'))) {
+    // Upsell / Bundle flow — show app suggestion cards
+    if (lower.includes('upsell') || lower.includes('cross-sell') || lower.includes('cross sell') || lower.includes('bundle') || lower.includes('appsell') || lower.includes('app sell')) {
+      return {
+        id: Math.random().toString(36).slice(2),
+        role: 'assistant',
+        content: 'Here are tools to help you add smart product suggestions and upsells. Browse top-rated third-party apps below to compare features, or use AI to generate a custom capability that fits exactly how you want to control recommendations and validations.',
+        showUpsellCards: true,
+      };
+    }
+
+    // Analytics / out-of-stock scenario
+    if (lower.includes('analytics') || lower.includes('out-of-stock') || lower.includes('out of stock') || lower.includes('stock request')) {
       return {
         id: Math.random().toString(36).slice(2),
         role: 'assistant',
@@ -284,6 +307,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
               label: 'Build a new dashboard page to show aggregated requests per product, along with last month\'s sales per product',
             },
           ],
+          appName: 'Back In Stock Analytics',
         },
       };
     }
@@ -293,12 +317,6 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
         id: Math.random().toString(36).slice(2),
         role: 'assistant',
         content: "To get more visitors, I'd recommend starting with SEO basics — make sure your site title, descriptions, and content include keywords your audience searches for. You can also connect Google Search Console from your Marketing tools.",
-      };
-    if (lower.includes('analytics'))
-      return {
-        id: Math.random().toString(36).slice(2),
-        role: 'assistant',
-        content: "You can set up analytics by going to Analytics in the left sidebar. I recommend connecting Google Analytics for deeper insights. Want me to walk you through it?",
       };
     if (lower.includes('offer') || lower.includes('promotion'))
       return {
@@ -414,7 +432,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
               onClick={() => {
                 const option = msg.widget!.options.find(o => o.id === selected);
                 if (option) {
-                  onStartBuilding?.(option.label);
+                  onStartBuilding?.(option.label, msg.widget!.appName);
                 }
               }}
               className="w-full py-2 rounded-lg text-xs font-semibold text-white transition-colors"
@@ -695,6 +713,11 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                   </div>
                   {msg.role === 'assistant' && renderWidget(msg)}
                   {msg.role === 'assistant' && renderAppMarketWidget(msg)}
+                  {msg.role === 'assistant' && msg.showUpsellCards && (
+                    <div className="mt-3">
+                      <UpsellAppCards onCreateWithAI={() => onStartBuilding?.('Create upsell capability with AI', 'Smart Product Bundles')} />
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -738,10 +761,10 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                     <span style={{ color: '#116dff' }}>{buildAppName}</span>...
                   </p>
                   <div className="flex flex-col gap-2.5">
-                    {BUILDING_STEPS.map((step, i) => {
+                    {buildingSteps.map((step, i) => {
                       if (i >= visibleSteps) return null;
                       const isLastVisible = i === visibleSteps - 1;
-                      const allDone = visibleSteps >= BUILDING_STEPS.length;
+                      const allDone = visibleSteps >= buildingSteps.length;
                       const isComplete = !isLastVisible || allDone;
 
                       return (
@@ -772,57 +795,111 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                       );
                     })}
                   </div>
-                  {visibleSteps >= BUILDING_STEPS.length && buildCompleted && (
-                    <div
-                      className="mt-3 rounded-xl overflow-hidden fade-in-up"
-                      style={{
-                        background: '#f7f8fa',
-                        border: '1px solid #e5e8ef',
-                      }}
-                    >
-                      <div className="px-3.5 py-3">
-                        <p className="text-[13px] font-medium text-center" style={{ color: '#32325d' }}>
-                          Your{' '}
-                          <span
-                            onClick={onNavigateToDashboard}
-                            className="cursor-pointer"
-                            style={{ color: '#00b383', textDecoration: 'underline', textUnderlineOffset: 2 }}
-                            onMouseEnter={e => ((e.currentTarget as HTMLSpanElement).style.opacity = '0.8')}
-                            onMouseLeave={e => ((e.currentTarget as HTMLSpanElement).style.opacity = '1')}
-                          >
-                            custom dashboard page
-                          </span>{' '}
-                          is ready!
+                  {visibleSteps >= buildingSteps.length && buildCompleted && (
+                    buildAppName === 'Smart Product Bundles' ? (
+                      /* ── Upsell completion widget ── */
+                      <div className="mt-3 flex flex-col gap-2 fade-in-up">
+                        <p className="text-[13px] font-medium" style={{ color: '#32325d' }}>
+                          All done! Your Product Suggestion App is now live and ready to use.
                         </p>
-                        <p className="text-[11px] text-center mt-1" style={{ color: '#6b7280' }}>
-                          You can continue editing it in chat and manage it in your custom creations
-                        </p>
-                      </div>
-                      <div
-                        className="px-3.5 py-2"
-                        style={{ borderTop: '1px solid #e5e8ef', background: '#ffffff' }}
-                      >
-                        <button
-                          onClick={onGoToCreations}
-                          className="w-full py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
-                          style={{
-                            color: '#32325d',
-                            background: '#ffffff',
-                            border: '1.5px solid #d0d5dd',
-                          }}
-                          onMouseEnter={e => {
-                            (e.currentTarget as HTMLButtonElement).style.background = '#f7f8fa';
-                            (e.currentTarget as HTMLButtonElement).style.borderColor = '#32325d';
-                          }}
-                          onMouseLeave={e => {
-                            (e.currentTarget as HTMLButtonElement).style.background = '#ffffff';
-                            (e.currentTarget as HTMLButtonElement).style.borderColor = '#d0d5dd';
-                          }}
+
+                        {/* Site Widget card */}
+                        <div
+                          className="rounded-xl overflow-hidden"
+                          style={{ background: '#f7f8fa', border: '1px solid #e5e8ef' }}
                         >
-                          View My Creations
-                        </button>
+                          <div className="px-3.5 py-2.5">
+                            <h4 className="text-[13px] font-semibold" style={{ color: '#1a1a2e' }}>Site Widget</h4>
+                            <p className="text-[11px] mt-0.5" style={{ color: '#6b7280' }}>Display personalized suggestions to customers</p>
+                          </div>
+                          <div className="px-3.5 py-2" style={{ borderTop: '1px solid #e5e8ef', background: '#ffffff' }}>
+                            <button
+                              onClick={() => window.open(window.location.origin + '?preview=cart', '_blank')}
+                              className="w-full py-1.5 rounded-lg text-[12px] font-semibold text-white transition-colors"
+                              style={{ background: '#116dff' }}
+                              onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#0d5fdb')}
+                              onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#116dff')}
+                            >
+                              Preview cart page on your site
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Dashboard Page card */}
+                        <div
+                          className="rounded-xl overflow-hidden"
+                          style={{ background: '#f7f8fa', border: '1px solid #e5e8ef' }}
+                        >
+                          <div className="px-3.5 py-2.5">
+                            <h4 className="text-[13px] font-semibold" style={{ color: '#1a1a2e' }}>Dashboard Page</h4>
+                            <p className="text-[11px] mt-0.5" style={{ color: '#6b7280' }}>Manage and configure suggestion rules</p>
+                          </div>
+                          <div className="px-3.5 py-2" style={{ borderTop: '1px solid #e5e8ef', background: '#ffffff' }}>
+                            <button
+                              onClick={onNavigateToUpsellRules}
+                              className="w-full py-1.5 rounded-lg text-[12px] font-semibold text-white transition-colors"
+                              style={{ background: '#116dff' }}
+                              onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#0d5fdb')}
+                              onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#116dff')}
+                            >
+                              Keep editing
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      /* ── Stock analytics completion widget ── */
+                      <div
+                        className="mt-3 rounded-xl overflow-hidden fade-in-up"
+                        style={{
+                          background: '#f7f8fa',
+                          border: '1px solid #e5e8ef',
+                        }}
+                      >
+                        <div className="px-3.5 py-3">
+                          <p className="text-[13px] font-medium text-center" style={{ color: '#32325d' }}>
+                            Your{' '}
+                            <span
+                              onClick={onNavigateToDashboard}
+                              className="cursor-pointer"
+                              style={{ color: '#00b383', textDecoration: 'underline', textUnderlineOffset: 2 }}
+                              onMouseEnter={e => ((e.currentTarget as HTMLSpanElement).style.opacity = '0.8')}
+                              onMouseLeave={e => ((e.currentTarget as HTMLSpanElement).style.opacity = '1')}
+                            >
+                              custom dashboard page
+                            </span>{' '}
+                            is ready!
+                          </p>
+                          <p className="text-[11px] text-center mt-1" style={{ color: '#6b7280' }}>
+                            You can continue editing it in chat and manage it in your custom creations
+                          </p>
+                        </div>
+                        <div
+                          className="px-3.5 py-2"
+                          style={{ borderTop: '1px solid #e5e8ef', background: '#ffffff' }}
+                        >
+                          <button
+                            onClick={onGoToCreations}
+                            className="w-full py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
+                            style={{
+                              color: '#32325d',
+                              background: '#ffffff',
+                              border: '1.5px solid #d0d5dd',
+                            }}
+                            onMouseEnter={e => {
+                              (e.currentTarget as HTMLButtonElement).style.background = '#f7f8fa';
+                              (e.currentTarget as HTMLButtonElement).style.borderColor = '#32325d';
+                            }}
+                            onMouseLeave={e => {
+                              (e.currentTarget as HTMLButtonElement).style.background = '#ffffff';
+                              (e.currentTarget as HTMLButtonElement).style.borderColor = '#d0d5dd';
+                            }}
+                          >
+                            View My Creations
+                          </button>
+                        </div>
+                      </div>
+                    )
                   )}
                 </div>
               </div>
