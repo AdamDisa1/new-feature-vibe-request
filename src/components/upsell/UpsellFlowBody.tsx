@@ -142,15 +142,15 @@ export function UpsellFlowBody({ onNavigate }: UpsellFlowBodyProps) {
   // ── Shared CTA cards ──
   const renderPostBuildCTAs = () => (
     <>
-      {/* Handoff message */}
+      {/* Dashboard section */}
       <div className="pt-4" style={{ borderTop: '1px solid #e5e8ef' }}>
-        <p className="text-sm" style={{ color: '#16161d', maxWidth: 301 }}>
-          I built the <span className="font-bold">Bundle Sales Dashboard</span> page for you. Now handing off to the Editor to build the <span className="font-bold">Bundle sell widget</span> — a customer-facing widget for your storefront.
+        <p className="text-sm" style={{ color: '#16161d' }}>
+          I built the <span className="font-bold">Bundle Sales Dashboard</span> page for you.
         </p>
 
         {/* Dashboard completed card */}
         <div
-          className="rounded-lg p-4 mt-4 space-y-3"
+          className="rounded-lg p-4 mt-3 space-y-3"
           style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
         >
           <div className="flex items-center gap-3">
@@ -183,6 +183,13 @@ export function UpsellFlowBody({ onNavigate }: UpsellFlowBodyProps) {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Widget section */}
+      <div className="pt-4 mt-4" style={{ borderTop: '1px solid #e5e8ef' }}>
+        <p className="text-sm" style={{ color: '#16161d' }}>
+          Now handing off to the Editor to build the <span className="font-bold">Bundle sell widget</span> — a customer-facing widget for your storefront.
+        </p>
 
         {/* Bundle sell widget action card */}
         <div
