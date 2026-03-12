@@ -107,6 +107,8 @@ const WixSidebar: React.FC<Props> = ({ currentPage, onNavigate, buildingMode, sh
   const [collapsed, setCollapsed] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [storeProductsOpen, setStoreProductsOpen] = useState(false);
+  const [bundleFreshlyAdded, setBundleFreshlyAdded] = useState(false);
+  const prevShowBundleRef = React.useRef(false);
 
   // Auto-expand catalog tree when building mode is active or on upsell-rules page
   useEffect(() => {
@@ -116,15 +118,58 @@ const WixSidebar: React.FC<Props> = ({ currentPage, onNavigate, buildingMode, sh
     }
   }, [buildingMode?.active, currentPage]);
 
+  // Detect when Bundle Sales Dashboard first appears and highlight it
+  useEffect(() => {
+    if (showBundleDashboard && !prevShowBundleRef.current) {
+      setBundleFreshlyAdded(true);
+      const timer = setTimeout(() => setBundleFreshlyAdded(false), 17000);
+      return () => clearTimeout(timer);
+    }
+    prevShowBundleRef.current = !!showBundleDashboard;
+  }, [showBundleDashboard]);
+
   const renderItem = (item: NavItemDef) => {
     const Icon = item.icon;
     const isCatalog = item.id === 'catalog';
-    const isActive = item.id === currentPage;
+    const isBundleDashboard = item.id === 'upsell-rules' && item.label === 'Bundle Sales Dashboard';
+    const isActive = item.id === currentPage || (isBundleDashboard && bundleFreshlyAdded);
     const isCatalogInBuildMode = buildingMode?.active && isCatalog;
     const isClickable = item.functional || isCatalog;
+    const showAIHighlight = isBundleDashboard && bundleFreshlyAdded;
 
     return (
       <React.Fragment key={item.id}>
+        <div className="relative">
+          {/* AI highlight glow for freshly added Bundle Dashboard */}
+          {showAIHighlight && (
+            <div
+              className="absolute inset-0 rounded-lg pointer-events-none"
+              style={{
+                background: 'rgba(17, 109, 255, 0.15)',
+                border: '1px solid rgba(17, 109, 255, 0.4)',
+                animation: 'ai-highlight-fade 17s ease-out forwards',
+              }}
+            />
+          )}
+          {/* AI sparkle badge */}
+          {showAIHighlight && !collapsed && (
+            <div
+              className="absolute flex items-center justify-center pointer-events-none"
+              style={{
+                top: -6,
+                right: 6,
+                width: 18,
+                height: 18,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #116dff, #00d4ff)',
+                boxShadow: '0 2px 6px rgba(17, 109, 255, 0.4)',
+                animation: 'ai-highlight-fade 17s ease-out forwards',
+                zIndex: 10,
+              }}
+            >
+              <Sparkles size={9} color="#fff" />
+            </div>
+          )}
         <button
           onClick={() => {
             if (isCatalog) {
@@ -182,6 +227,7 @@ const WixSidebar: React.FC<Props> = ({ currentPage, onNavigate, buildingMode, sh
             </>
           )}
         </button>
+        </div>
 
         {/* Catalog sub-tree */}
         {isCatalog && catalogOpen && !collapsed && (

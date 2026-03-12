@@ -200,6 +200,12 @@ pre code {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes ai-highlight-fade {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 .skeleton-bone {
   position: relative;
   overflow: hidden;
