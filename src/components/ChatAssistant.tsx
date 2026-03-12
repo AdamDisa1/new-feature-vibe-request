@@ -21,6 +21,7 @@ import {
 import { BuildingModeState } from '../App';
 import { useUpsellChat } from './upsell/UpsellChatContext';
 import { UpsellFlowBody, CREATED_DATE_KEYWORDS } from './upsell/UpsellFlowBody';
+import { UpsellAppCards } from './upsell/UpsellAppCards';
 
 interface RadioOption {
   id: string;
@@ -103,7 +104,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
 
   const buildingSteps = useMemo(() => {
     if (buildingMode?.appName === 'Smart Product Bundles') return BUILDING_STEPS_UPSELL;
-    return BUILDING_STEPS_STOCK;
+    return BUILDING_STEPS;
   }, [buildingMode?.appName]);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -761,7 +762,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                     <span style={{ color: '#116dff' }}>{buildAppName}</span>...
                   </p>
                   <div className="flex flex-col gap-2.5">
-                    {buildingSteps.map((step, i) => {
+                    {buildingSteps.map((step: string, i: number) => {
                       if (i >= visibleSteps) return null;
                       const isLastVisible = i === visibleSteps - 1;
                       const allDone = visibleSteps >= buildingSteps.length;
@@ -836,7 +837,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
                           </div>
                           <div className="px-3.5 py-2" style={{ borderTop: '1px solid #e5e8ef', background: '#ffffff' }}>
                             <button
-                              onClick={onNavigateToUpsellRules}
+                              onClick={() => onNavigate?.('upsell-rules')}
                               className="w-full py-1.5 rounded-lg text-[12px] font-semibold text-white transition-colors"
                               style={{ background: '#116dff' }}
                               onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#0d5fdb')}

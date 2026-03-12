@@ -303,7 +303,7 @@ function AppInner() {
       {/* Top bar */}
       <WixTopBar
         onToggleChat={() => setIsChatOpen(prev => !prev)}
-        isAIPanelOpen={isChatOpen}
+        isChatOpen={isChatOpen}
       />
 
       {/* Body */}

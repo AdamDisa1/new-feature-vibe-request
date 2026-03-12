@@ -237,7 +237,7 @@ function EditorContent() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#f7f8fa' }}>
-      <WixTopBar isAIPanelOpen={true} />
+      <WixTopBar isChatOpen={true} />
 
       <div className="flex flex-1 overflow-hidden">
         <WixSidebar
