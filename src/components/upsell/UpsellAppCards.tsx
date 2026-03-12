@@ -56,49 +56,46 @@ export function UpsellAppCards({ onCreateWithAI }: UpsellAppCardsProps) {
         </button>
       ))}
 
-      {/* AI Card — gradient border */}
+      {/* AI Card — boxed like others with AI badge */}
       <button
         onClick={onCreateWithAI}
-        className="w-full text-left rounded-lg p-3 flex items-start gap-3 transition-all"
+        className="w-full text-left rounded-lg p-3 flex items-start gap-3 transition-colors relative overflow-visible"
         style={{
-          background: '#ffffff',
-          border: '2px solid transparent',
-          backgroundClip: 'padding-box',
-          position: 'relative',
+          border: '1px solid #e5e8ef',
+          backgroundColor: '#ffffff',
         }}
+        onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
+        onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
       >
-        {/* Gradient border trick */}
+        {/* AI badge top-right */}
         <div
-          className="absolute inset-0 rounded-lg -z-10"
+          className="absolute flex items-center justify-center"
           style={{
-            margin: -2,
-            borderRadius: 10,
-            background: 'linear-gradient(135deg, #0099FF, #00D4FF)',
+            top: -8,
+            right: 10,
+            width: 22,
+            height: 22,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #7c6af5, #9b87f5)',
+            boxShadow: '0 2px 6px rgba(124, 106, 245, 0.35)',
           }}
-        />
-        <div className="absolute inset-0 rounded-lg" style={{ backgroundColor: '#ffffff' }} />
+        >
+          <Sparkles size={11} color="#fff" />
+        </div>
 
-        <div className="relative flex items-start gap-3 w-full">
-          <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 relative"
-            style={{ backgroundColor: '#f0f0f5' }}
-          >
-            <Plus className="w-5 h-5" style={{ color: '#116dff' }} />
-            <div
-              className="absolute -top-1.5 -left-1.5 w-4 h-4 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: '#116dff' }}
-            >
-              <Sparkles className="w-2.5 h-2.5" style={{ color: '#ffffff' }} />
-            </div>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold" style={{ color: '#16161d' }}>
-              Create upsell capability with AI
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
-              A tailored application to manage your recommendation rules in a dedicated dashboard page
-            </p>
-          </div>
+        <div
+          className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ backgroundColor: '#f0f0f5' }}
+        >
+          <Plus className="w-5 h-5" style={{ color: '#116dff' }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold" style={{ color: '#16161d' }}>
+            Create upsell capability with AI
+          </p>
+          <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
+            A tailored application to manage your recommendation rules in a dedicated dashboard page
+          </p>
         </div>
       </button>
     </div>

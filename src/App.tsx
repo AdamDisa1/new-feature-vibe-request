@@ -44,7 +44,7 @@ function AppInner() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [generateAppMode, setGenerateAppMode] = useState(false);
   const [editAppMode, setEditAppMode] = useState<string | null>(null);
-  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [buildingMode, setBuildingMode] = useState<BuildingModeState | null>(null);
   const [showEmptyCreations, setShowEmptyCreations] = useState(false);
   const [prefillChatInput, setPrefillChatInput] = useState('');
@@ -53,7 +53,7 @@ function AppInner() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   // Upsell chat
-  const { isUpsellPanelOpen, setIsUpsellPanelOpen } = useUpsellChat();
+  const { isUpsellPanelOpen, setIsUpsellPanelOpen, dashboardCreated, setDashboardCreated } = useUpsellChat();
 
   const addToast = useCallback((message: string, type: Toast['type'] = 'success') => {
     const id = Math.random().toString(36).slice(2);
@@ -310,7 +310,7 @@ function AppInner() {
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <WixSidebar currentPage={currentPage} onNavigate={handleNav} buildingMode={buildingMode} />
+        <WixSidebar currentPage={currentPage} onNavigate={handleNav} buildingMode={buildingMode} showBundleDashboard={dashboardCreated} />
 
         {/* Main */}
         <main className="flex-1 overflow-hidden">{renderContent()}</main>
