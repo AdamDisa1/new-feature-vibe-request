@@ -82,7 +82,7 @@ const MyCreationsView: React.FC<Props> = ({
           <div className="flex items-start justify-between mb-5">
             <div>
               <h1 className="text-2xl font-bold" style={{ color: '#16161d' }}>
-                Custom Creations
+                My Creations
               </h1>
               <p className="text-sm mt-1" style={{ color: '#6b7280' }}>
                 Capabilities and bundles you've built for your site
@@ -100,7 +100,7 @@ const MyCreationsView: React.FC<Props> = ({
               }
             >
               <Plus size={15} />
-              New Capability
+              New Creation
             </button>
           </div>
 
@@ -242,7 +242,7 @@ const MyCreationsView: React.FC<Props> = ({
               }
             >
               <Plus size={15} />
-              New Capability
+              New Creation
             </button>
           </div>
         ) : filtered.length === 0 ? (
