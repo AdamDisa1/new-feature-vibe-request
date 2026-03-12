@@ -103,7 +103,7 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5">
-      {/* Aria greeting */}
+      {/* Aria greeting + Dashboard card */}
       <div className="flex gap-3">
         <div
           className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
@@ -116,10 +116,10 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
             Here's a summary of what I built for you:
           </p>
 
-          {/* Dashboard card */}
+          {/* Dashboard card — no green background */}
           <div
             className="rounded-lg p-3 space-y-2.5"
-            style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
+            style={{ backgroundColor: '#f7f8fa', border: '1px solid #e5e8ef' }}
           >
             <div className="flex items-center gap-2.5">
               <div
@@ -139,8 +139,8 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
               <button
                 onClick={() => onNavigate('upsell-rules')}
                 className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
-                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #e5e8ef' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
               >
                 <ExternalLink className="w-3 h-3" /> View
@@ -148,55 +148,29 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
               <button
                 onClick={() => onNavigate('creations')}
                 className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
-                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #e5e8ef' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
               >
                 Manage
               </button>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Widget card */}
-          <div
-            className="rounded-lg p-3 space-y-2.5"
-            style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
-          >
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: '#22c55e' }}
-              >
-                <Check className="w-3 h-3" style={{ color: '#ffffff' }} />
-              </div>
-              <p className="text-xs font-semibold" style={{ color: '#16161d' }}>
-                Bundle Sell Widget
-              </p>
-            </div>
-            <p className="text-xs" style={{ color: '#6b7280' }}>
-              A customer-facing storefront widget that shows product recommendations at checkout.
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => window.open(window.location.origin + '?preview=editor', '_blank')}
-                className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
-                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
-              >
-                <ExternalLink className="w-3 h-3" /> View in Editor
-              </button>
-              <button
-                onClick={() => onNavigate('creations')}
-                className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
-                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
-              >
-                Manage
-              </button>
-            </div>
-          </div>
+      {/* Aria message: building widget */}
+      <div className="flex gap-3">
+        <div
+          className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+          style={{ backgroundColor: '#116dff' }}
+        >
+          <Sparkles className="w-3.5 h-3.5" style={{ color: '#ffffff' }} />
+        </div>
+        <div className="flex-1 space-y-4" style={{ maxWidth: 310 }}>
+          <p className="text-sm" style={{ color: '#16161d' }}>
+            I'm now going to build your new Bundle Widget
+          </p>
 
           {/* Build steps */}
           {steps.length > 0 && (
@@ -222,6 +196,49 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
                     </span>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Widget card — shown after build completes, with green background */}
+          {buildDone && (
+            <div
+              className="rounded-lg p-3 space-y-2.5"
+              style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
+            >
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: '#22c55e' }}
+                >
+                  <Check className="w-3 h-3" style={{ color: '#ffffff' }} />
+                </div>
+                <p className="text-xs font-semibold" style={{ color: '#16161d' }}>
+                  Bundle Sell Widget
+                </p>
+              </div>
+              <p className="text-xs" style={{ color: '#6b7280' }}>
+                A customer-facing storefront widget that shows product recommendations at checkout.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => window.open(window.location.origin + '?preview=editor', '_blank')}
+                  className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
+                  style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
+                >
+                  <ExternalLink className="w-3 h-3" /> View in Editor
+                </button>
+                <button
+                  onClick={() => onNavigate('creations')}
+                  className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
+                  style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
+                >
+                  Manage
+                </button>
               </div>
             </div>
           )}

@@ -95,7 +95,7 @@ function EditorHarmonyLoader({ onComplete }: { onComplete: () => void }) {
               textShadow: '0 0 30px rgba(17,109,255,0.5)',
             }}
           >
-            Harmony
+            Studio 2
           </h1>
           <p
             className="text-sm mt-2 font-medium"

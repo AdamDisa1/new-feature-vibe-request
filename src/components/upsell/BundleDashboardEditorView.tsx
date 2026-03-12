@@ -234,101 +234,90 @@ export function BundleDashboardEditorView({ bundleLoading = false }: { bundleLoa
 
           {/* Bundle this with section */}
           <div className="px-8 pb-8">
-            <div
-              className="pt-6"
-              style={{ borderTop: '1px solid #f0f0f0' }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <ShoppingBag size={16} style={{ color: '#e85d2a' }} />
-                <h3 className="text-lg font-light" style={{ color: '#e85d2a' }}>
-                  Bundle this with
-                </h3>
-                <span
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: '#fff3ed', color: '#e85d2a' }}
-                >
-                  SAVE 20%
-                </span>
-              </div>
-
+            <div className="pt-6" style={{ borderTop: '1px solid #f0f0f0' }}>
               {bundleLoading && !showBundle ? (
-                /* Skeleton loading state */
-                <div className="grid grid-cols-3 gap-4">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="space-y-3 animate-pulse">
-                      <div
-                        className="rounded-lg"
-                        style={{ height: 160, backgroundColor: '#e5e7eb' }}
-                      />
-                      <div className="space-y-2">
-                        <div className="h-3 rounded" style={{ backgroundColor: '#e5e7eb', width: '75%' }} />
-                        <div className="flex gap-2">
-                          <div className="h-3 rounded" style={{ backgroundColor: '#e5e7eb', width: '30%' }} />
-                          <div className="h-3 rounded" style={{ backgroundColor: '#f3f4f6', width: '25%' }} />
+                /* Skeleton loading state — includes header */
+                <div className="animate-pulse">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-4 h-4 rounded" style={{ backgroundColor: '#e5e7eb' }} />
+                    <div className="h-5 rounded" style={{ backgroundColor: '#e5e7eb', width: 140 }} />
+                    <div className="h-4 rounded-full" style={{ backgroundColor: '#e5e7eb', width: 70 }} />
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="space-y-3">
+                        <div className="rounded-lg" style={{ height: 160, backgroundColor: '#e5e7eb' }} />
+                        <div className="space-y-2">
+                          <div className="h-3 rounded" style={{ backgroundColor: '#e5e7eb', width: '75%' }} />
+                          <div className="flex gap-2">
+                            <div className="h-3 rounded" style={{ backgroundColor: '#e5e7eb', width: '30%' }} />
+                            <div className="h-3 rounded" style={{ backgroundColor: '#f3f4f6', width: '25%' }} />
+                          </div>
                         </div>
+                        <div className="h-8 rounded-lg" style={{ backgroundColor: '#e5e7eb' }} />
                       </div>
-                      <div
-                        className="h-8 rounded-lg"
-                        style={{ backgroundColor: '#e5e7eb' }}
-                      />
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               ) : (
                 /* Revealed bundle products */
                 <div
-                  className="grid grid-cols-3 gap-4 transition-all duration-700"
+                  className="transition-all duration-700"
                   style={{ opacity: showBundle ? 1 : 0, transform: showBundle ? 'translateY(0)' : 'translateY(8px)' }}
                 >
-                  {BUNDLE_PRODUCTS.map((product, i) => (
-                    <div key={i} className="group cursor-pointer">
-                      <div
-                        className="rounded-lg overflow-hidden mb-2 transition-shadow"
-                        style={{ height: 160, backgroundColor: '#f9f5f0', border: '1px solid #f0ebe4' }}
-                      >
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                          onError={e => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      </div>
-                      <p className="text-xs font-medium mb-1" style={{ color: '#3b3b4f' }}>
-                        {product.name}
-                      </p>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-light" style={{ color: '#e85d2a' }}>{product.price}</span>
-                        <span className="text-xs line-through" style={{ color: '#999' }}>{product.oldPrice}</span>
-                      </div>
-                      <button
-                        className="w-full h-8 rounded-lg text-xs font-medium tracking-wider transition-colors"
-                        style={{ border: '1px solid #e85d2a', color: '#e85d2a', backgroundColor: '#ffffff' }}
-                      >
-                        ADD TO BUNDLE
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Bundle total bar */}
-              {showBundle && (
-                <div
-                  className="mt-4 flex items-center justify-between p-3 rounded-lg transition-opacity duration-500"
-                  style={{ backgroundColor: '#fff8f5', border: '1px solid #fde0d2', opacity: showBundle ? 1 : 0 }}
-                >
-                  <div>
-                    <p className="text-xs font-medium" style={{ color: '#e85d2a' }}>Bundle Deal</p>
-                    <p className="text-[10px]" style={{ color: '#999' }}>Add all 3 items and save 20%</p>
+                  <div className="flex items-center gap-2 mb-4">
+                    <ShoppingBag size={16} style={{ color: '#e85d2a' }} />
+                    <h3 className="text-lg font-light" style={{ color: '#e85d2a' }}>Bundle this with</h3>
+                    <span
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                      style={{ backgroundColor: '#fff3ed', color: '#e85d2a' }}
+                    >
+                      SAVE 20%
+                    </span>
                   </div>
-                  <button
-                    className="px-4 py-1.5 rounded-lg text-xs font-medium text-white"
-                    style={{ backgroundColor: '#e85d2a' }}
+                  <div className="grid grid-cols-3 gap-4">
+                    {BUNDLE_PRODUCTS.map((product, i) => (
+                      <div key={i} className="group cursor-pointer">
+                        <div
+                          className="rounded-lg overflow-hidden mb-2 transition-shadow"
+                          style={{ height: 160, backgroundColor: '#f9f5f0', border: '1px solid #f0ebe4' }}
+                        >
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        </div>
+                        <p className="text-xs font-medium mb-1" style={{ color: '#3b3b4f' }}>{product.name}</p>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-sm font-light" style={{ color: '#e85d2a' }}>{product.price}</span>
+                          <span className="text-xs line-through" style={{ color: '#999' }}>{product.oldPrice}</span>
+                        </div>
+                        <button
+                          className="w-full h-8 rounded-lg text-xs font-medium tracking-wider transition-colors"
+                          style={{ border: '1px solid #e85d2a', color: '#e85d2a', backgroundColor: '#ffffff' }}
+                        >
+                          ADD TO BUNDLE
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div
+                    className="mt-4 flex items-center justify-between p-3 rounded-lg"
+                    style={{ backgroundColor: '#fff8f5', border: '1px solid #fde0d2' }}
                   >
-                    ADD ALL TO CART — $104.48
-                  </button>
+                    <div>
+                      <p className="text-xs font-medium" style={{ color: '#e85d2a' }}>Bundle Deal</p>
+                      <p className="text-[10px]" style={{ color: '#999' }}>Add all 3 items and save 20%</p>
+                    </div>
+                    <button
+                      className="px-4 py-1.5 rounded-lg text-xs font-medium text-white"
+                      style={{ backgroundColor: '#e85d2a' }}
+                    >
+                      ADD ALL TO CART — $104.48
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
