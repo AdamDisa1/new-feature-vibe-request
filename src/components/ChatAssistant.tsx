@@ -17,6 +17,10 @@ import {
   Star,
   Wand2,
   CheckCircle,
+  Check,
+  Layers,
+  ArrowRight,
+  ExternalLink,
 } from 'lucide-react';
 import { BuildingModeState } from '../App';
 import { useUpsellChat } from './upsell/UpsellChatContext';
@@ -89,6 +93,114 @@ interface ChatAssistantProps {
   onPrefillConsumed?: () => void;
   onNavigate?: (page: string) => void;
   forceUpsellFlow?: boolean;
+}
+
+// ── Upsell Summary Body (clean post-build summary) ───────────────────────────
+function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void }) {
+  return (
+    <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5">
+      {/* Aria greeting */}
+      <div className="flex gap-3">
+        <div
+          className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+          style={{ backgroundColor: '#116dff' }}
+        >
+          <Sparkles className="w-3.5 h-3.5" style={{ color: '#ffffff' }} />
+        </div>
+        <div className="flex-1 space-y-4" style={{ maxWidth: 310 }}>
+          <p className="text-sm" style={{ color: '#16161d' }}>
+            Here's a summary of what I built for you:
+          </p>
+
+          {/* Dashboard card */}
+          <div
+            className="rounded-lg p-3 space-y-2.5"
+            style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
+          >
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: '#22c55e' }}
+              >
+                <Check className="w-3 h-3" style={{ color: '#ffffff' }} />
+              </div>
+              <p className="text-xs font-semibold" style={{ color: '#16161d' }}>
+                Bundle Sales Dashboard
+              </p>
+            </div>
+            <p className="text-xs" style={{ color: '#6b7280' }}>
+              A dedicated dashboard page to manage your recommendation rules, track performance, and configure product bundles.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => onNavigate('upsell-rules')}
+                className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
+                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
+              >
+                <ExternalLink className="w-3 h-3" /> View
+              </button>
+              <button
+                onClick={() => onNavigate('creations')}
+                className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
+                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
+              >
+                Manage
+              </button>
+            </div>
+          </div>
+
+          {/* Widget card */}
+          <div
+            className="rounded-lg p-3 space-y-2.5"
+            style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
+          >
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: '#22c55e' }}
+              >
+                <Check className="w-3 h-3" style={{ color: '#ffffff' }} />
+              </div>
+              <p className="text-xs font-semibold" style={{ color: '#16161d' }}>
+                Bundle Sell Widget
+              </p>
+            </div>
+            <p className="text-xs" style={{ color: '#6b7280' }}>
+              A customer-facing storefront widget that shows product recommendations at checkout.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => window.open(window.location.origin + '?preview=editor', '_blank')}
+                className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
+                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
+              >
+                <ExternalLink className="w-3 h-3" /> View in Editor
+              </button>
+              <button
+                onClick={() => onNavigate('creations')}
+                className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
+                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
+              >
+                Manage
+              </button>
+            </div>
+          </div>
+
+          <p className="text-xs" style={{ color: '#6b7280' }}>
+            Is there anything else you'd like me to help with?
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, onEnterGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard, onGoToCreations, onShowEmptyCreations, prefillInput, onPrefillConsumed, onNavigate, forceUpsellFlow }) => {
@@ -614,7 +726,9 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
       </div>
 
       {/* ── Body ──────────────────────────────────────── */}
-      {upsellFlowActive ? (
+      {upsellCtx.summaryMode ? (
+        <UpsellSummaryBody onNavigate={onNavigate || (() => {})} />
+      ) : upsellFlowActive ? (
         <UpsellFlowBody onNavigate={onNavigate || (() => {})} />
       ) : (
       <div className="flex-1 overflow-y-auto px-5 py-6 scrollbar-none">
