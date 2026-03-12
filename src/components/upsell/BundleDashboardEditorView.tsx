@@ -1,5 +1,5 @@
-import { Plus, Type, Image, Layers, LayoutGrid, Columns, Table2, Users, AppWindow, CheckSquare, MessageSquare, HelpCircle, Minus } from 'lucide-react';
-import { useState } from 'react';
+import { Plus, Type, Image, Layers, LayoutGrid, Columns, Table2, Users, AppWindow, CheckSquare, MessageSquare, HelpCircle, Minus, ShoppingBag } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 // A Wix-Editor-like page showing the Bundle Sales Dashboard in an editor canvas
 
@@ -15,8 +15,39 @@ const PRODUCT_IMAGES = [
   'https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?w=150&h=150&fit=crop',
 ];
 
-export function BundleDashboardEditorView() {
+// Bundle product images
+const BUNDLE_PRODUCTS = [
+  {
+    name: 'Woven Picnic Basket',
+    price: '$64.00',
+    oldPrice: '$85.00',
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop',
+  },
+  {
+    name: 'Striped Beach Blanket',
+    price: '$42.00',
+    oldPrice: '$58.00',
+    image: 'https://images.unsplash.com/photo-1600369672770-985fd30004eb?w=300&h=300&fit=crop',
+  },
+  {
+    name: 'Canvas Tote Bag',
+    price: '$36.00',
+    oldPrice: '$48.00',
+    image: 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=300&h=300&fit=crop',
+  },
+];
+
+export function BundleDashboardEditorView({ bundleLoading = false }: { bundleLoading?: boolean }) {
   const [quantity, setQuantity] = useState(1);
+  // Small delay after bundleLoading becomes false to animate the reveal
+  const [showBundle, setShowBundle] = useState(false);
+
+  useEffect(() => {
+    if (!bundleLoading) {
+      const timer = setTimeout(() => setShowBundle(true), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [bundleLoading]);
 
   return (
     <div className="flex flex-1 h-full overflow-hidden" style={{ backgroundColor: '#f0f0f0' }}>
@@ -55,8 +86,8 @@ export function BundleDashboardEditorView() {
         </div>
         <div className="flex-1 w-full overflow-auto flex justify-center py-4 px-4">
         <div
-          className="w-full shadow-lg overflow-hidden"
-          style={{ maxWidth: 1100, backgroundColor: '#ffffff', border: '1px solid #d0d0d0' }}
+          className="w-full shadow-lg"
+          style={{ maxWidth: 1100, backgroundColor: '#ffffff', border: '1px solid #d0d0d0', borderRadius: 8 }}
         >
           {/* Site header bar */}
           <div
@@ -198,6 +229,108 @@ export function BundleDashboardEditorView() {
               >
                 ADD TO CART
               </button>
+            </div>
+          </div>
+
+          {/* Bundle this with section */}
+          <div className="px-8 pb-8">
+            <div
+              className="pt-6"
+              style={{ borderTop: '1px solid #f0f0f0' }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <ShoppingBag size={16} style={{ color: '#e85d2a' }} />
+                <h3 className="text-lg font-light" style={{ color: '#e85d2a' }}>
+                  Bundle this with
+                </h3>
+                <span
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                  style={{ backgroundColor: '#fff3ed', color: '#e85d2a' }}
+                >
+                  SAVE 20%
+                </span>
+              </div>
+
+              {bundleLoading && !showBundle ? (
+                /* Skeleton loading state */
+                <div className="grid grid-cols-3 gap-4">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="space-y-3 animate-pulse">
+                      <div
+                        className="rounded-lg"
+                        style={{ height: 160, backgroundColor: '#e5e7eb' }}
+                      />
+                      <div className="space-y-2">
+                        <div className="h-3 rounded" style={{ backgroundColor: '#e5e7eb', width: '75%' }} />
+                        <div className="flex gap-2">
+                          <div className="h-3 rounded" style={{ backgroundColor: '#e5e7eb', width: '30%' }} />
+                          <div className="h-3 rounded" style={{ backgroundColor: '#f3f4f6', width: '25%' }} />
+                        </div>
+                      </div>
+                      <div
+                        className="h-8 rounded-lg"
+                        style={{ backgroundColor: '#e5e7eb' }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                /* Revealed bundle products */
+                <div
+                  className="grid grid-cols-3 gap-4 transition-all duration-700"
+                  style={{ opacity: showBundle ? 1 : 0, transform: showBundle ? 'translateY(0)' : 'translateY(8px)' }}
+                >
+                  {BUNDLE_PRODUCTS.map((product, i) => (
+                    <div key={i} className="group cursor-pointer">
+                      <div
+                        className="rounded-lg overflow-hidden mb-2 transition-shadow"
+                        style={{ height: 160, backgroundColor: '#f9f5f0', border: '1px solid #f0ebe4' }}
+                      >
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          onError={e => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs font-medium mb-1" style={{ color: '#3b3b4f' }}>
+                        {product.name}
+                      </p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-sm font-light" style={{ color: '#e85d2a' }}>{product.price}</span>
+                        <span className="text-xs line-through" style={{ color: '#999' }}>{product.oldPrice}</span>
+                      </div>
+                      <button
+                        className="w-full h-8 rounded-lg text-xs font-medium tracking-wider transition-colors"
+                        style={{ border: '1px solid #e85d2a', color: '#e85d2a', backgroundColor: '#ffffff' }}
+                      >
+                        ADD TO BUNDLE
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Bundle total bar */}
+              {showBundle && (
+                <div
+                  className="mt-4 flex items-center justify-between p-3 rounded-lg transition-opacity duration-500"
+                  style={{ backgroundColor: '#fff8f5', border: '1px solid #fde0d2', opacity: showBundle ? 1 : 0 }}
+                >
+                  <div>
+                    <p className="text-xs font-medium" style={{ color: '#e85d2a' }}>Bundle Deal</p>
+                    <p className="text-[10px]" style={{ color: '#999' }}>Add all 3 items and save 20%</p>
+                  </div>
+                  <button
+                    className="px-4 py-1.5 rounded-lg text-xs font-medium text-white"
+                    style={{ backgroundColor: '#e85d2a' }}
+                  >
+                    ADD ALL TO CART — $113.60
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

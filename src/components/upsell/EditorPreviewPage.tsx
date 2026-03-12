@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Sparkles, Check, Loader2 } from 'lucide-react';
 import { UpsellChatProvider, useUpsellChat } from './UpsellChatContext';
-import { UpsellSkeletonCart } from './UpsellSkeletonCart';
 import { BundleDashboardEditorView } from './BundleDashboardEditorView';
-import CartPreview from './CartPreview';
 import ChatAssistant from '../ChatAssistant';
 import type { BuildStep } from './UpsellChatContext';
 
@@ -166,17 +164,17 @@ const WIDGET_BUILD_STEPS_DATA = [
 
 function EditorContent() {
   const ctx = useUpsellChat();
-  const [showPreview, setShowPreview] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentIndexRef = useRef(-1);
   const stepsRef = useRef<BuildStep[]>(
     WIDGET_BUILD_STEPS_DATA.map(step => ({ ...step, status: 'pending' as const })),
   );
 
-  // Initialize context to post-build state
+  // Initialize context — show summary immediately, editor view from start
   useEffect(() => {
     ctx.setAppBuilt(true);
     ctx.setDashboardCreated(true);
+    ctx.setSummaryMode(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -223,17 +221,12 @@ function EditorContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Transition skeleton → editor view after build completes, switch chat to summary
+  // Mark build phase done when all steps complete
   useEffect(() => {
-    if (ctx.widgetBuildDone && !showPreview) {
-      const timer = setTimeout(() => {
-        setShowPreview(true);
-        ctx.setWidgetBuildPhase('done');
-        ctx.setSummaryMode(true);
-      }, 1500);
-      return () => clearTimeout(timer);
+    if (ctx.widgetBuildDone) {
+      ctx.setWidgetBuildPhase('done');
     }
-  }, [ctx.widgetBuildDone, showPreview, ctx]);
+  }, [ctx.widgetBuildDone, ctx]);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#f0f0f0' }}>
@@ -298,7 +291,7 @@ function EditorContent() {
       {/* Editor body: canvas + chat */}
       <div className="flex flex-1 overflow-hidden">
         <main className="flex-1 overflow-hidden">
-          {showPreview ? <BundleDashboardEditorView /> : <UpsellSkeletonCart />}
+          <BundleDashboardEditorView bundleLoading={!ctx.widgetBuildDone} />
         </main>
 
         <ChatAssistant

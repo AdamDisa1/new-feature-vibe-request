@@ -97,6 +97,10 @@ interface ChatAssistantProps {
 
 // ── Upsell Summary Body (clean post-build summary) ───────────────────────────
 function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void }) {
+  const upsellCtx = useUpsellChat();
+  const steps = upsellCtx.widgetBuildSteps;
+  const buildDone = upsellCtx.widgetBuildDone;
+
   return (
     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5">
       {/* Aria greeting */}
@@ -194,9 +198,39 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
             </div>
           </div>
 
-          <p className="text-xs" style={{ color: '#6b7280' }}>
-            Is there anything else you'd like me to help with?
-          </p>
+          {/* Build steps */}
+          {steps.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-semibold" style={{ color: '#16161d' }}>
+                {buildDone ? 'Bundle widget added to your page' : 'Adding bundle widget to your page...'}
+              </p>
+              <div className="space-y-1.5">
+                {steps.map(step => (
+                  <div key={step.id} className="flex items-center gap-2">
+                    {step.status === 'completed' ? (
+                      <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22c55e' }} />
+                    ) : step.status === 'active' ? (
+                      <Loader2 className="w-3.5 h-3.5 flex-shrink-0 animate-spin" style={{ color: '#116dff' }} />
+                    ) : (
+                      <div className="w-3.5 h-3.5 flex-shrink-0 rounded-full" style={{ border: '1.5px solid #d1d5db' }} />
+                    )}
+                    <span
+                      className="text-xs"
+                      style={{ color: step.status === 'active' ? '#16161d' : step.status === 'completed' ? '#6b7280' : '#9ca3af' }}
+                    >
+                      {step.message}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {buildDone && (
+            <p className="text-xs" style={{ color: '#6b7280' }}>
+              Is there anything else you'd like me to help with?
+            </p>
+          )}
         </div>
       </div>
     </div>
