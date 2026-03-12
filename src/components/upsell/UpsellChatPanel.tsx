@@ -285,6 +285,15 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
               >
                 Manage in My Creations
               </button>
+              <button
+                onClick={() => window.open('https://editor.wix.com', '_blank')}
+                className="w-full h-9 rounded flex items-center justify-center gap-2 text-sm font-semibold transition-colors"
+                style={{ backgroundColor: '#ffffff', color: '#116dff', border: '1px solid #116dff' }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#f0f4ff'; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
+              >
+                View Editor Page
+              </button>
             </div>
           )}
         </div>
