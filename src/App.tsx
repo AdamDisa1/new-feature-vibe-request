@@ -9,6 +9,9 @@ import AppDetailPanel from './components/AppDetailPanel';
 import ShareModal from './components/ShareModal';
 import WixTopBar from './components/WixTopBar';
 import WixSidebar from './components/WixSidebar';
+import ChatAssistant from './components/ChatAssistant';
+import BuildingDashboardPage from './components/BuildingDashboardPage';
+import HomePage from './components/HomePage';
 import WixHomePage from './components/WixHomePage';
 import { UpsellChatProvider, useUpsellChat } from './components/upsell/UpsellChatContext';
 import { UpsellChatPanel } from './components/upsell/UpsellChatPanel';
@@ -17,6 +20,13 @@ import { UpsellRulesView } from './components/upsell/UpsellRulesView';
 import { UpsellPreviewPage } from './components/upsell/UpsellPreviewPage';
 
 type NavPage = 'home' | 'creations' | 'settings' | 'upsell-build' | 'upsell-rules';
+
+export interface BuildingModeState {
+  active: boolean;
+  appName: string;
+  completed: boolean;
+  freshlyBuilt: boolean;
+}
 
 function AppInner() {
   const [currentPage, setCurrentPage] = useState<NavPage>('home');
@@ -31,6 +41,12 @@ function AppInner() {
   const [selectedAsset, setSelectedAsset] = useState<Extension | null>(null);
   const [sharingApp, setSharingApp] = useState<CreatedApp | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [generateAppMode, setGenerateAppMode] = useState(false);
+  const [editAppMode, setEditAppMode] = useState<string | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [buildingMode, setBuildingMode] = useState<BuildingModeState | null>(null);
+  const [showEmptyCreations, setShowEmptyCreations] = useState(false);
+  const [prefillChatInput, setPrefillChatInput] = useState('');
 
   // Toasts
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -48,13 +64,91 @@ function AppInner() {
     setCurrentPage(page as NavPage);
     setSelectedApp(null);
     setSelectedAsset(null);
+    setBuildingMode(null);
   };
+
+  // ── ChatAssistant build handlers ──────────────────────────────────────────
+
+  const handleStartBuilding = useCallback((selectedOptionLabel: string) => {
+    setBuildingMode({
+      active: true,
+      appName: 'Back In Stock Analytics',
+      completed: false,
+      freshlyBuilt: false,
+    });
+  }, []);
+
+  const handleChatBuildComplete = useCallback(() => {
+    setBuildingMode(prev => prev ? { ...prev, completed: true, freshlyBuilt: true } : prev);
+
+    // Add the new creation to My Creations (only if not already there)
+    setApps(prev => {
+      if (prev.some(a => a.id === 'app-bis-aggregation')) return prev;
+      const now = new Date().toISOString();
+      const newApp: CreatedApp = {
+        id: 'app-bis-aggregation',
+        name: 'Back In Stock Requests Aggregation',
+        description:
+          'Aggregated dashboard for back-in-stock requests showing product-level analytics, request trends, and customer notifications.',
+        status: 'active',
+        author: 'alice@example.com',
+        createdAt: now,
+        modifiedAt: now,
+        extensionIds: ['dp-analytics'],
+        currentVersion: '1.0.0',
+        versions: [
+          {
+            id: 'v-bis-1',
+            version: '1.0.0',
+            label: 'Initial AI-generated dashboard',
+            createdAt: now,
+            author: 'Aria AI',
+            layers: {
+              liveSite: [],
+              dashboard: ['dp-analytics'],
+              code: [],
+            },
+          },
+        ],
+      };
+      return [newApp, ...prev];
+    });
+  }, []);
+
+  const handleNavigateToDashboard = useCallback(() => {
+    setBuildingMode({ active: true, appName: 'Back In Stock Analytics', completed: true, freshlyBuilt: false });
+    setSelectedApp(null);
+    setSelectedAsset(null);
+  }, []);
+
+  const handleEditWithAI = useCallback((app: CreatedApp) => {
+    setEditAppMode(app.name);
+    setGenerateAppMode(false);
+    setIsChatOpen(true);
+  }, []);
+
+  const handleShowEmptyCreations = useCallback(() => {
+    setShowEmptyCreations(true);
+    setCurrentPage('creations');
+    setSelectedApp(null);
+    setSelectedAsset(null);
+    setBuildingMode(null);
+  }, []);
+
+  const handleSuggestionCardClick = useCallback((prompt: string) => {
+    setPrefillChatInput(prompt);
+    setGenerateAppMode(true);
+    setEditAppMode(null);
+    setIsChatOpen(true);
+  }, []);
+
+  // ── Upsell flow handlers ────────────────────────────────────────────────
 
   const handleUpsellNavigate = useCallback((page: string) => {
     setCurrentPage(page as NavPage);
   }, []);
 
-  const handleBuildComplete = useCallback(() => {
+  const handleUpsellBuildComplete = useCallback(() => {
     setCurrentPage('upsell-rules');
   }, []);
 
@@ -104,12 +198,17 @@ function AppInner() {
   // ── Content renderer ──────────────────────────────────────────────────────
 
   const renderContent = () => {
+    // Building mode: show skeleton dashboard (from ChatAssistant flow)
+    if (buildingMode?.active) {
+      return <BuildingDashboardPage appName={buildingMode.appName} completed={buildingMode.completed} freshlyBuilt={buildingMode.freshlyBuilt} />;
+    }
+
     // Upsell flow pages
     if (currentPage === 'upsell-build') {
       return (
         <UpsellBuildView
           onBack={() => setCurrentPage('creations')}
-          onBuildComplete={handleBuildComplete}
+          onBuildComplete={handleUpsellBuildComplete}
         />
       );
     }
@@ -165,6 +264,10 @@ function AppInner() {
           onSelectApp={app => { setSelectedApp(app); setSelectedAsset(null); }}
           onShareApp={setSharingApp}
           onDeleteApp={handleDeleteApp}
+          onNewApp={() => { setGenerateAppMode(true); setEditAppMode(null); setIsChatOpen(true); }}
+          onEditWithAI={handleEditWithAI}
+          showEmptyState={showEmptyCreations}
+          onSuggestionClick={handleSuggestionCardClick}
         />
       );
     }
@@ -189,6 +292,7 @@ function AppInner() {
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#f7f8fa' }}>
       {/* Top bar */}
       <WixTopBar
+        onToggleChat={() => setIsChatOpen(prev => !prev)}
         onAIClick={() => setIsUpsellPanelOpen(!isUpsellPanelOpen)}
         isAIPanelOpen={isUpsellPanelOpen}
       />
@@ -196,12 +300,31 @@ function AppInner() {
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <WixSidebar currentPage={currentPage} onNavigate={handleNav} />
+        <WixSidebar currentPage={currentPage} onNavigate={handleNav} buildingMode={buildingMode} />
 
         {/* Main */}
         <main className="flex-1 overflow-hidden">{renderContent()}</main>
 
-        {/* AI Chat Panel */}
+        {/* Chat Assistant (ChatAssistant flow) */}
+        <ChatAssistant
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          generateAppMode={generateAppMode}
+          onExitGenerateApp={() => setGenerateAppMode(false)}
+          onEnterGenerateApp={() => { setGenerateAppMode(true); setEditAppMode(null); }}
+          editAppMode={editAppMode}
+          onExitEditApp={() => setEditAppMode(null)}
+          buildingMode={buildingMode}
+          onStartBuilding={handleStartBuilding}
+          onBuildComplete={handleChatBuildComplete}
+          onNavigateToDashboard={handleNavigateToDashboard}
+          onGoToCreations={() => handleNav('creations')}
+          onShowEmptyCreations={handleShowEmptyCreations}
+          prefillInput={prefillChatInput}
+          onPrefillConsumed={() => setPrefillChatInput('')}
+        />
+
+        {/* AI Chat Panel (Upsell flow) */}
         {isUpsellPanelOpen && (
           <UpsellChatPanel onNavigate={handleUpsellNavigate} />
         )}

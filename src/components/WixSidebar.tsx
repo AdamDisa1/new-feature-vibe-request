@@ -32,10 +32,12 @@ import {
   Share2,
   BookOpen,
 } from 'lucide-react';
+import { BuildingModeState } from '../App';
 
 interface Props {
   currentPage: string;
   onNavigate: (page: string) => void;
+  buildingMode?: BuildingModeState | null;
 }
 
 interface SubItem {
@@ -99,23 +101,24 @@ const BOTTOM_ITEMS: NavItemDef[] = [
   { id: 'settings', label: 'Settings', icon: Settings, functional: true },
 ];
 
-const WixSidebar: React.FC<Props> = ({ currentPage, onNavigate }) => {
+const WixSidebar: React.FC<Props> = ({ currentPage, onNavigate, buildingMode }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [storeProductsOpen, setStoreProductsOpen] = useState(false);
 
-  // Auto-expand catalog tree when on upsell-rules page
+  // Auto-expand catalog tree when building mode is active or on upsell-rules page
   useEffect(() => {
-    if (currentPage === 'upsell-rules') {
+    if (buildingMode?.active || currentPage === 'upsell-rules') {
       setCatalogOpen(true);
       setStoreProductsOpen(true);
     }
-  }, [currentPage]);
+  }, [buildingMode?.active, currentPage]);
 
   const renderItem = (item: NavItemDef) => {
     const Icon = item.icon;
     const isCatalog = item.id === 'catalog';
     const isActive = item.id === currentPage || (isCatalog && currentPage === 'upsell-rules');
+    const isCatalogInBuildMode = buildingMode?.active && isCatalog;
     const isClickable = item.functional || isCatalog;
 
     return (
@@ -133,7 +136,7 @@ const WixSidebar: React.FC<Props> = ({ currentPage, onNavigate }) => {
           style={{
             gap: collapsed ? 0 : 9,
             justifyContent: collapsed ? 'center' : 'flex-start',
-            color: isActive ? '#ffffff' : '#9fa0b0',
+            color: isActive || isCatalogInBuildMode ? '#ffffff' : '#9fa0b0',
             background: isActive && !isCatalog ? 'rgba(255,255,255,0.12)' : 'transparent',
             cursor: isClickable ? 'pointer' : 'default',
           }}

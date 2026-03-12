@@ -9,11 +9,12 @@ import {
 } from 'lucide-react';
 
 interface WixTopBarProps {
+  onToggleChat?: () => void;
   onAIClick?: () => void;
   isAIPanelOpen?: boolean;
 }
 
-const WixTopBar: React.FC<WixTopBarProps> = ({ onAIClick, isAIPanelOpen }) => (
+const WixTopBar: React.FC<WixTopBarProps> = ({ onToggleChat, onAIClick, isAIPanelOpen }) => (
   <div
     className="flex items-center gap-3 px-4 flex-shrink-0 border-b"
     style={{ background: '#ffffff', borderColor: '#e5e8ef', height: 48, zIndex: 50 }}
@@ -136,9 +137,9 @@ const WixTopBar: React.FC<WixTopBarProps> = ({ onAIClick, isAIPanelOpen }) => (
 
       {/* AI button */}
       <button
+        onClick={() => { onToggleChat?.(); onAIClick?.(); }}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-colors"
         style={{ background: isAIPanelOpen ? '#0d5fdb' : '#116dff' }}
-        onClick={onAIClick}
         onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#0d5fdb')}
         onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = isAIPanelOpen ? '#0d5fdb' : '#116dff')}
       >

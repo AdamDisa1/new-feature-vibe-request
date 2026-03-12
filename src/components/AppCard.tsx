@@ -18,6 +18,7 @@ interface Props {
   onSelect: () => void;
   onShare: () => void;
   onDelete: () => void;
+  onEditWithAI?: () => void;
 }
 
 const STATUS_STYLES = {
@@ -93,7 +94,7 @@ const LayerDots: React.FC<{ app: CreatedApp; extensions: Extension[] }> = ({
   );
 };
 
-const AppCard: React.FC<Props> = ({ app, extensions, onSelect, onShare, onDelete }) => {
+const AppCard: React.FC<Props> = ({ app, extensions, onSelect, onShare, onDelete, onEditWithAI }) => {
   const accent = getAccentColor(app, extensions);
   const status = STATUS_STYLES[app.status] ?? STATUS_STYLES.draft;
 
@@ -172,7 +173,7 @@ const AppCard: React.FC<Props> = ({ app, extensions, onSelect, onShare, onDelete
 
         <div className="flex items-center gap-0.5">
           {[
-            { icon: Sparkles, label: 'Edit with AI', color: '#7c6af5' },
+            { icon: Sparkles, label: 'Edit with AI', color: '#7c6af5', onClick: () => onEditWithAI?.() },
             { icon: Code2, label: 'Edit in Code', color: '#116dff', onClick: () => {} },
             { icon: Share2, label: 'Share', onClick: () => onShare() },
           ].map(action => {
