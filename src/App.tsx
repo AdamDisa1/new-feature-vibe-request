@@ -12,6 +12,7 @@ import WixSidebar from './components/WixSidebar';
 import ChatAssistant from './components/ChatAssistant';
 import BuildingDashboardPage from './components/BuildingDashboardPage';
 import HomePage from './components/HomePage';
+import WixHomePage from './components/WixHomePage';
 import { UpsellChatProvider, useUpsellChat } from './components/upsell/UpsellChatContext';
 import { UpsellChatPanel } from './components/upsell/UpsellChatPanel';
 import { UpsellBuildView } from './components/upsell/UpsellBuildView';
@@ -28,7 +29,7 @@ export interface BuildingModeState {
 }
 
 function AppInner() {
-  const [currentPage, setCurrentPage] = useState<NavPage>('creations');
+  const [currentPage, setCurrentPage] = useState<NavPage>('home');
 
   // Extensions state
   const [extensions, setExtensions] = useState<Extension[]>(MOCK_EXTENSIONS);
@@ -272,7 +273,7 @@ function AppInner() {
     }
 
     if (currentPage === 'home') {
-      return <HomePage />;
+      return <WixHomePage onNavigate={handleNav} />;
     }
 
     // Placeholder pages
@@ -281,9 +282,7 @@ function AppInner() {
         className="flex flex-col items-center justify-center h-full gap-3"
         style={{ background: '#f7f8fa' }}
       >
-        <p className="text-sm font-medium" style={{ color: '#32325d' }}>
-          Settings
-        </p>
+        <p className="text-sm font-medium" style={{ color: '#32325d' }}>Settings</p>
         <p className="text-xs" style={{ color: '#9098a9' }}>Coming soon</p>
       </div>
     );
