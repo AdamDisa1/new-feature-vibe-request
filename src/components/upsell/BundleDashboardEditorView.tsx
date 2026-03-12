@@ -18,22 +18,22 @@ const PRODUCT_IMAGES = [
 // Bundle product images
 const BUNDLE_PRODUCTS = [
   {
-    name: 'Woven Picnic Basket',
-    price: '$64.00',
-    oldPrice: '$85.00',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop',
+    name: 'Speckled White Enamel Mug Set (Set of 4)',
+    price: '$29.99',
+    oldPrice: '$39.99',
+    image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=300&h=300&fit=crop',
   },
   {
-    name: 'Striped Beach Blanket',
-    price: '$42.00',
-    oldPrice: '$58.00',
-    image: 'https://images.unsplash.com/photo-1600369672770-985fd30004eb?w=300&h=300&fit=crop',
+    name: 'Hand-Carved Acacia Wood Serving Board',
+    price: '$19.49',
+    oldPrice: '$27.00',
+    image: 'https://images.unsplash.com/photo-1588165171080-c89acfa5ee83?w=300&h=300&fit=crop',
   },
   {
-    name: 'Canvas Tote Bag',
-    price: '$36.00',
-    oldPrice: '$48.00',
-    image: 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=300&h=300&fit=crop',
+    name: 'Blue Speckle Enamel Oil & Vinegar Cruet Set',
+    price: '$55.00',
+    oldPrice: '$72.00',
+    image: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=300&h=300&fit=crop',
   },
 ];
 
@@ -87,7 +87,7 @@ export function BundleDashboardEditorView({ bundleLoading = false }: { bundleLoa
         <div className="flex-1 w-full overflow-auto flex justify-center py-4 px-4">
         <div
           className="w-full shadow-lg"
-          style={{ maxWidth: 1100, backgroundColor: '#ffffff', border: '1px solid #d0d0d0', borderRadius: 8 }}
+          style={{ maxWidth: 1100, backgroundColor: '#ffffff', border: '1px solid #d0d0d0', borderRadius: 8, minHeight: 'fit-content' }}
         >
           {/* Site header bar */}
           <div
@@ -327,7 +327,7 @@ export function BundleDashboardEditorView({ bundleLoading = false }: { bundleLoa
                     className="px-4 py-1.5 rounded-lg text-xs font-medium text-white"
                     style={{ backgroundColor: '#e85d2a' }}
                   >
-                    ADD ALL TO CART — $113.60
+                    ADD ALL TO CART — $104.48
                   </button>
                 </div>
               )}
