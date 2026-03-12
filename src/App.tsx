@@ -13,12 +13,11 @@ import ChatAssistant from './components/ChatAssistant';
 import BuildingDashboardPage from './components/BuildingDashboardPage';
 import HomePage from './components/HomePage';
 import WixHomePage from './components/WixHomePage';
-import { UpsellChatProvider, useUpsellChat } from './components/upsell/UpsellChatContext';
+import { UpsellChatProvider } from './components/upsell/UpsellChatContext';
 import { UpsellBuildView } from './components/upsell/UpsellBuildView';
 import { UpsellRulesView } from './components/upsell/UpsellRulesView';
 import { UpsellPreviewPage } from './components/upsell/UpsellPreviewPage';
 import { UpsellWidgetBuildView } from './components/upsell/UpsellWidgetBuildView';
-import { EditorPreviewPage } from './components/upsell/EditorPreviewPage';
 
 type NavPage = 'home' | 'creations' | 'settings' | 'upsell-build' | 'upsell-rules' | 'upsell-widget-build';
 
@@ -44,16 +43,13 @@ function AppInner() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [generateAppMode, setGenerateAppMode] = useState(false);
   const [editAppMode, setEditAppMode] = useState<string | null>(null);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(true);
   const [buildingMode, setBuildingMode] = useState<BuildingModeState | null>(null);
   const [showEmptyCreations, setShowEmptyCreations] = useState(false);
   const [prefillChatInput, setPrefillChatInput] = useState('');
 
   // Toasts
   const [toasts, setToasts] = useState<Toast[]>([]);
-
-  // Upsell chat
-  const { dashboardCreated } = useUpsellChat();
 
   const addToast = useCallback((message: string, type: Toast['type'] = 'success') => {
     const id = Math.random().toString(36).slice(2);
@@ -303,13 +299,13 @@ function AppInner() {
       {/* Top bar */}
       <WixTopBar
         onToggleChat={() => setIsChatOpen(prev => !prev)}
-        isAIPanelOpen={isChatOpen}
+        isChatOpen={isChatOpen}
       />
 
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <WixSidebar currentPage={currentPage} onNavigate={handleNav} buildingMode={buildingMode} showBundleDashboard={dashboardCreated} />
+        <WixSidebar currentPage={currentPage} onNavigate={handleNav} buildingMode={buildingMode} />
 
         {/* Main */}
         <main className="flex-1 overflow-hidden">{renderContent()}</main>
@@ -331,10 +327,9 @@ function AppInner() {
           onShowEmptyCreations={handleShowEmptyCreations}
           prefillInput={prefillChatInput}
           onPrefillConsumed={() => setPrefillChatInput('')}
-          onNavigate={handleUpsellNavigate}
+          onNavigateToUpsellBuild={() => setCurrentPage('upsell-build')}
+          onNavigateToUpsellRules={() => setCurrentPage('upsell-rules')}
         />
-
-        {/* Upsell flow now lives inside ChatAssistant via UpsellFlowBody */}
       </div>
 
       {/* Modals */}
@@ -361,16 +356,9 @@ function AppInner() {
 }
 
 function App() {
-  const preview = new URLSearchParams(window.location.search).get('preview');
-
-  // If opened with ?preview=cart, render the fullscreen cart preview page
-  if (preview === 'cart') {
+  // If opened with ?preview=cart, render the fullscreen preview page
+  if (new URLSearchParams(window.location.search).get('preview') === 'cart') {
     return <UpsellPreviewPage />;
-  }
-
-  // If opened with ?preview=editor, render the editor preview (loader → skeleton + Aria)
-  if (preview === 'editor') {
-    return <EditorPreviewPage />;
   }
 
   return (
