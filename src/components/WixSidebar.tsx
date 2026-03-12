@@ -38,6 +38,7 @@ interface Props {
   currentPage: string;
   onNavigate: (page: string) => void;
   buildingMode?: BuildingModeState | null;
+  showBundleDashboard?: boolean;
 }
 
 interface SubItem {
@@ -102,7 +103,7 @@ const BOTTOM_ITEMS: NavItemDef[] = [
   { id: 'settings', label: 'Settings', icon: Settings, functional: true },
 ];
 
-const WixSidebar: React.FC<Props> = ({ currentPage, onNavigate, buildingMode }) => {
+const WixSidebar: React.FC<Props> = ({ currentPage, onNavigate, buildingMode, showBundleDashboard }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [storeProductsOpen, setStoreProductsOpen] = useState(false);
@@ -325,7 +326,7 @@ const WixSidebar: React.FC<Props> = ({ currentPage, onNavigate, buildingMode }) 
 
       {/* Nav items */}
       <nav className="flex-1 overflow-y-auto px-1.5 py-1 flex flex-col gap-0.5">
-        {TOP_ITEMS.map(renderItem)}
+        {TOP_ITEMS.filter(item => item.id !== 'upsell-rules' || showBundleDashboard).map(renderItem)}
 
         {/* Divider */}
         <div className="my-1.5 mx-2" style={{ borderTop: '1px solid #2a2a36' }} />

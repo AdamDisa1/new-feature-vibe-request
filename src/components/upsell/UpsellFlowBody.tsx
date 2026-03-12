@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Sparkles, Send, Check, Loader2, Layers, ArrowRight } from 'lucide-react';
+import { Sparkles, Send, Check, Loader2, Layers, ArrowRight } from 'lucide-react';
 import { useUpsellChat } from './UpsellChatContext';
 import { UpsellChatMessage } from './UpsellChatMessage';
 import { StreamingResponse } from './StreamingResponse';
@@ -40,16 +40,14 @@ const CREATED_DATE_KEYWORDS = [
   'remove the created', 'hide the created', 'remove created',
 ];
 
-interface UpsellChatPanelProps {
+interface UpsellFlowBodyProps {
   onNavigate: (page: string) => void;
 }
 
-export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
+export function UpsellFlowBody({ onNavigate }: UpsellFlowBodyProps) {
   const {
     phase,
-    setPhase,
     userMessage,
-    setUserMessage,
     showBlueprint,
     setShowBlueprint,
     hasStreamed,
@@ -66,7 +64,6 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
     addPostBuildMessage,
     chatInputValue,
     setChatInputValue,
-    setIsUpsellPanelOpen,
     setDashboardCreated,
     widgetBuildPhase,
     widgetBuildSteps,
@@ -103,48 +100,32 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
     return CREATED_DATE_KEYWORDS.some(kw => lower.includes(kw));
   };
 
-  const handleSend = () => {
-    const trimmed = chatInputValue.trim();
+  /** Called by ChatAssistant when user sends a message in post-build mode */
+  const handlePostBuildSend = (text: string) => {
+    const trimmed = text.trim();
     if (!trimmed) return;
 
-    // Post-build messaging
-    if (appBuilt) {
-      addPostBuildMessage({ role: 'user', content: trimmed });
-      setChatInputValue('');
+    addPostBuildMessage({ role: 'user', content: trimmed });
 
-      if (detectCreatedDateIntent(trimmed)) {
-        setIsAriaTyping(true);
-        setTimeout(() => {
-          setHideCreatedDate(true);
-          addPostBuildMessage({
-            role: 'assistant',
-            content: 'Done! I\'ve hidden the "Created" date column from your Suggestion Rules Dashboard. Only the "Last Modified" date is now visible in the table. Let me know if you\'d like any other changes.',
-          });
-          setIsAriaTyping(false);
-        }, 1500);
-      } else {
-        setIsAriaTyping(true);
-        setTimeout(() => {
-          addPostBuildMessage({
-            role: 'assistant',
-            content: 'I can help you customize your Bundle Sales Dashboard. Try asking me to modify the dashboard layout, update rule settings, or change how data is displayed — for example, you can ask me to remove the created date from the rules table.',
-          });
-          setIsAriaTyping(false);
-        }, 1200);
-      }
-      return;
-    }
-
-    // Initial conversation
-    setUserMessage(trimmed);
-    setChatInputValue('');
-    setPhase('conversation');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+    if (detectCreatedDateIntent(trimmed)) {
+      setIsAriaTyping(true);
+      setTimeout(() => {
+        setHideCreatedDate(true);
+        addPostBuildMessage({
+          role: 'assistant',
+          content: 'Done! I\'ve hidden the "Created" date column from your Suggestion Rules Dashboard. Only the "Last Modified" date is now visible in the table. Let me know if you\'d like any other changes.',
+        });
+        setIsAriaTyping(false);
+      }, 1500);
+    } else {
+      setIsAriaTyping(true);
+      setTimeout(() => {
+        addPostBuildMessage({
+          role: 'assistant',
+          content: 'I can help you customize your Bundle Sales Dashboard. Try asking me to modify the dashboard layout, update rule settings, or change how data is displayed — for example, you can ask me to remove the created date from the rules table.',
+        });
+        setIsAriaTyping(false);
+      }, 1200);
     }
   };
 
@@ -153,23 +134,23 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
   };
 
   const handleApproveBlueprint = () => {
-    setAppBuilt(false); // will be set true when build completes
-    setDashboardCreated(true); // show in sidebar immediately
+    setAppBuilt(false);
+    setDashboardCreated(true);
     onNavigate('upsell-build');
   };
 
-  // ── Shared CTA cards (used in both renderCompleted and renderBuildProgress) ──
+  // ── Shared CTA cards ──
   const renderPostBuildCTAs = () => (
     <>
-      {/* Handoff message */}
+      {/* Dashboard section */}
       <div className="pt-4" style={{ borderTop: '1px solid #e5e8ef' }}>
-        <p className="text-sm" style={{ color: '#16161d', maxWidth: 301 }}>
-          I built the <span className="font-bold">Bundle Sales Dashboard</span> page for you. Now handing off to the Editor to build the <span className="font-bold">Bundle sell widget</span> — a customer-facing widget for your storefront.
+        <p className="text-sm" style={{ color: '#16161d' }}>
+          I built the <span className="font-bold">Bundle Sales Dashboard</span> page for you.
         </p>
 
         {/* Dashboard completed card */}
         <div
-          className="rounded-lg p-4 mt-4 space-y-3"
+          className="rounded-lg p-4 mt-3 space-y-3"
           style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
         >
           <div className="flex items-center gap-3">
@@ -181,10 +162,10 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
             </div>
             <p className="text-sm font-semibold" style={{ color: '#16161d' }}>Bundle Sales Dashboard page created</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
             <button
               onClick={() => onNavigate('creations')}
-              className="flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold text-white transition-colors"
+              className="w-full h-8 rounded-lg flex items-center justify-center text-xs font-semibold text-white transition-colors"
               style={{ backgroundColor: '#116dff' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#0d5fdb')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#116dff')}
@@ -193,7 +174,7 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
             </button>
             <button
               onClick={() => onNavigate('upsell-rules')}
-              className="h-9 px-4 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
+              className="w-full h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
               style={{ color: '#16161d', border: '1px solid #bbf7d0', backgroundColor: '#ffffff' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
@@ -202,6 +183,13 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Widget section */}
+      <div className="pt-4 mt-4" style={{ borderTop: '1px solid #e5e8ef' }}>
+        <p className="text-sm" style={{ color: '#16161d' }}>
+          Now handing off to the Editor to build the <span className="font-bold">Bundle sell widget</span> — a customer-facing widget for your storefront.
+        </p>
 
         {/* Bundle sell widget action card */}
         <div
@@ -222,10 +210,12 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
               </p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
             <button
-              onClick={() => onNavigate('upsell-widget-build')}
-              className="flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold text-white transition-colors"
+              onClick={() => {
+                window.open(window.location.origin + '?preview=editor', '_blank');
+              }}
+              className="w-full h-8 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold text-white transition-colors"
               style={{ backgroundColor: '#116dff' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#0d5fdb')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#116dff')}
@@ -234,7 +224,7 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
             </button>
             <button
               onClick={() => {}}
-              className="h-9 px-4 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
+              className="w-full h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
               style={{ color: '#6b7280', border: '1px solid #e5e8ef', backgroundColor: '#ffffff' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
@@ -245,7 +235,7 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
         </div>
       </div>
 
-      {/* Widget build checklist (when building or done) */}
+      {/* Widget build checklist */}
       {(widgetBuildPhase === 'building' || widgetBuildPhase === 'done') && (
         <div className="pt-4 mt-4" style={{ borderTop: '1px solid #e5e8ef' }}>
           <p className="text-sm font-semibold mb-3" style={{ color: '#16161d' }}>
@@ -305,7 +295,7 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
     </>
   );
 
-  // ── Render: Completed state (post-build) ─────────────────────────────────
+  // ── Render: Completed state ──
   const renderCompleted = () => (
     <div className="flex-1 overflow-y-auto px-4 pb-4" ref={dashboardScrollRef}>
       <div className="flex gap-3 mb-4">
@@ -388,7 +378,7 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
     </div>
   );
 
-  // ── Render: Build in progress (steps in chat) ────────────────────────────
+  // ── Render: Build in progress ──
   const renderBuildProgress = () => (
     <div className="flex-1 overflow-y-auto px-4 pb-4">
       <UpsellChatMessage
@@ -434,25 +424,7 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
     </div>
   );
 
-  // ── Render: Welcome ──────────────────────────────────────────────────────
-  const renderWelcome = () => (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-      <div
-        className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
-        style={{ backgroundColor: '#e8f1fe' }}
-      >
-        <Sparkles className="w-7 h-7" style={{ color: '#116dff' }} />
-      </div>
-      <h3 className="text-base font-bold mb-2" style={{ color: '#16161d' }}>
-        Hi, I'm your AI assistant
-      </h3>
-      <p className="text-sm" style={{ color: '#6b7280', maxWidth: 280 }}>
-        I can help you build custom capabilities, add features, and optimize your site. Tell me what you'd like to create.
-      </p>
-    </div>
-  );
-
-  // ── Render: Conversation ─────────────────────────────────────────────────
+  // ── Render: Conversation ──
   const renderConversation = () => (
     <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6" ref={scrollRef}>
       {/* User message */}
@@ -472,7 +444,7 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
         }
       />
 
-      {/* Blueprint (after AI card click) */}
+      {/* Blueprint */}
       {showBlueprint && (
         <UpsellChatMessage
           role="assistant"
@@ -504,73 +476,17 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
     </div>
   );
 
-  // ── Determine which content to show ──────────────────────────────────────
+  // ── Body dispatcher ──
   const renderBody = () => {
     if (appBuilt) return renderCompleted();
     if (buildSteps.length > 0) return renderBuildProgress();
     if (phase === 'conversation') return renderConversation();
-    return renderWelcome();
+    // If we get here in upsell mode, show the conversation (the welcome is handled by ChatAssistant)
+    return renderConversation();
   };
 
-  return (
-    <div
-      className="w-96 h-full flex flex-col border-l flex-shrink-0"
-      style={{
-        backgroundColor: '#ffffff',
-        borderColor: '#e5e8ef',
-        animation: 'slideIn 0.2s ease-out',
-      }}
-    >
-      {/* Header */}
-      <div
-        className="px-4 py-3 border-b flex items-center justify-between flex-shrink-0"
-        style={{ borderColor: '#e5e8ef' }}
-      >
-        <div className="flex items-center gap-2">
-          <div
-            className="w-6 h-6 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: '#116dff' }}
-          >
-            <Sparkles className="w-3.5 h-3.5" style={{ color: '#ffffff' }} />
-          </div>
-          <span className="text-sm font-bold" style={{ color: '#16161d' }}>AI Assistant</span>
-        </div>
-        <button
-          onClick={() => setIsUpsellPanelOpen(false)}
-          className="p-1 rounded transition-colors"
-          style={{ color: '#6b7280' }}
-          onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
-          onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Body */}
-      {renderBody()}
-
-      {/* Input area */}
-      <div
-        className="px-4 py-3 border-t flex items-center gap-2 flex-shrink-0"
-        style={{ borderColor: '#e5e8ef' }}
-      >
-        <input
-          type="text"
-          value={chatInputValue}
-          onChange={e => setChatInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={appBuilt ? 'Ask me to customize...' : 'Tell me what you need...'}
-          className="flex-1 px-3 py-2 rounded-lg text-sm outline-none"
-          style={{ backgroundColor: '#f7f8fa', border: '1px solid #e5e8ef', color: '#16161d' }}
-        />
-        <button
-          onClick={handleSend}
-          className="p-2 rounded-lg transition-colors"
-          style={{ backgroundColor: chatInputValue.trim() ? '#116dff' : '#e5e8ef' }}
-        >
-          <Send className="w-4 h-4" style={{ color: chatInputValue.trim() ? '#ffffff' : '#9098a9' }} />
-        </button>
-      </div>
-    </div>
-  );
+  return <>{renderBody()}</>;
 }
+
+// Export the post-build send handler logic so ChatAssistant can call it
+export { CREATED_DATE_KEYWORDS };

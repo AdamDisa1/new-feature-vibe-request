@@ -19,7 +19,8 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { BuildingModeState } from '../App';
-import { UpsellAppCards } from './upsell/UpsellAppCards';
+import { useUpsellChat } from './upsell/UpsellChatContext';
+import { UpsellFlowBody, CREATED_DATE_KEYWORDS } from './upsell/UpsellFlowBody';
 
 interface RadioOption {
   id: string;
@@ -55,7 +56,9 @@ const SUGGESTIONS = [
   'Plan my first offer',
 ];
 
-const BUILDING_STEPS_STOCK = [
+const UPSELL_KEYWORDS = ['upsell', 'bundle', 'cross-sell', 'cross sell', 'recommendation', 'suggest'];
+
+const BUILDING_STEPS = [
   'Adding aggregated requests field to Out Of Stock dashboard...',
   'Generating CMS collection for the aggregation...',
   'Defining data schema...',
@@ -83,11 +86,11 @@ interface ChatAssistantProps {
   onShowEmptyCreations?: () => void;
   prefillInput?: string;
   onPrefillConsumed?: () => void;
-  onNavigateToUpsellBuild?: () => void;
-  onNavigateToUpsellRules?: () => void;
+  onNavigate?: (page: string) => void;
+  forceUpsellFlow?: boolean;
 }
 
-const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, onEnterGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard, onGoToCreations, onShowEmptyCreations, prefillInput, onPrefillConsumed, onNavigateToUpsellBuild, onNavigateToUpsellRules }) => {
+const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, onEnterGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard, onGoToCreations, onShowEmptyCreations, prefillInput, onPrefillConsumed, onNavigate, forceUpsellFlow }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -95,6 +98,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
   const [visibleSteps, setVisibleSteps] = useState(0);
   const [buildCompleted, setBuildCompleted] = useState(false);
   const [buildAppName, setBuildAppName] = useState('');
+  const [upsellFlowActive, setUpsellFlowActive] = useState(!!forceUpsellFlow);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const buildingSteps = useMemo(() => {
@@ -102,6 +106,9 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
     return BUILDING_STEPS_STOCK;
   }, [buildingMode?.appName]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Upsell context for flow activation
+  const upsellCtx = useUpsellChat();
 
   const hasConversation = messages.length > 0;
 
@@ -193,6 +200,24 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
 
+    // If upsell flow is active and in post-build mode, route to upsell handler
+    if (upsellFlowActive && upsellCtx.appBuilt) {
+      handleUpsellPostBuildSend(text.trim());
+      return;
+    }
+
+    const lower = text.trim().toLowerCase();
+
+    // Check for upsell keywords — activate upsell flow
+    const isUpsell = UPSELL_KEYWORDS.some(kw => lower.includes(kw));
+    if (isUpsell && !upsellFlowActive) {
+      setInput('');
+      setUpsellFlowActive(true);
+      upsellCtx.setUserMessage(text.trim());
+      upsellCtx.setPhase('conversation');
+      return;
+    }
+
     const userMsg: Message = {
       id: Math.random().toString(36).slice(2),
       role: 'user',
@@ -203,7 +228,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
     setIsTyping(true);
 
     // Check for empty state trigger
-    if (text.trim().toLowerCase() === 'my creations empty state') {
+    if (lower === 'my creations empty state') {
       setTimeout(() => {
         onShowEmptyCreations?.();
         const reply: Message = {
@@ -223,6 +248,32 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
       setMessages(prev => [...prev, reply]);
       setIsTyping(false);
     }, 1200);
+  };
+
+  // Handle post-build messaging for upsell flow
+  const handleUpsellPostBuildSend = (text: string) => {
+    setInput('');
+    upsellCtx.addPostBuildMessage({ role: 'user', content: text });
+
+    const lower = text.toLowerCase();
+    const isCreatedDateIntent = CREATED_DATE_KEYWORDS.some(kw => lower.includes(kw));
+
+    if (isCreatedDateIntent) {
+      setTimeout(() => {
+        upsellCtx.setHideCreatedDate(true);
+        upsellCtx.addPostBuildMessage({
+          role: 'assistant',
+          content: 'Done! I\'ve hidden the "Created" date column from your Suggestion Rules Dashboard. Only the "Last Modified" date is now visible in the table. Let me know if you\'d like any other changes.',
+        });
+      }, 1500);
+    } else {
+      setTimeout(() => {
+        upsellCtx.addPostBuildMessage({
+          role: 'assistant',
+          content: 'I can help you customize your Bundle Sales Dashboard. Try asking me to modify the dashboard layout, update rule settings, or change how data is displayed — for example, you can ask me to remove the created date from the rules table.',
+        });
+      }, 1200);
+    }
   };
 
   const getReply = (text: string): Message => {
@@ -515,7 +566,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
     <div
       className="flex flex-col flex-shrink-0 border-l"
       style={{
-        width: 320,
+        width: 380,
         background: '#ffffff',
         borderColor: '#e5e8ef',
         height: '100%',
@@ -562,6 +613,9 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
       </div>
 
       {/* ── Body ──────────────────────────────────────── */}
+      {upsellFlowActive ? (
+        <UpsellFlowBody onNavigate={onNavigate || (() => {})} />
+      ) : (
       <div className="flex-1 overflow-y-auto px-5 py-6 scrollbar-none">
         {!hasConversation ? (
           /* ── Welcome state ── */
@@ -855,6 +909,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
           </div>
         )}
       </div>
+      )}
 
       {/* ── Input area ────────────────────────────────── */}
       <div className="flex-shrink-0 px-4 pb-3 pt-2">
