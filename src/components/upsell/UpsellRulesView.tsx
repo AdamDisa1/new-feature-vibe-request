@@ -27,7 +27,7 @@ const mockRules: SuggestionRule[] = [
     created: '2024-01-15',
     modified: '2024-02-10',
     triggerEvent: 'Product added to cart',
-    targetProducts: 'Summer Collection',
+    targetProducts: 'Speckled White Enamel Mug Set',
     customerSegment: 'All customers',
     suggestionLogic: { type: 'specific', value: 'Beach Accessories Set' },
   },
@@ -39,7 +39,7 @@ const mockRules: SuggestionRule[] = [
     created: '2024-01-20',
     modified: '2024-02-12',
     triggerEvent: 'Checkout started',
-    targetProducts: 'Premium Products',
+    targetProducts: 'Hand-Carved Acacia Wood Serving Board',
     customerSegment: 'VIP Members',
     suggestionLogic: { type: 'condition', value: 'Category: Premium, Price > $100' },
   },
@@ -51,7 +51,7 @@ const mockRules: SuggestionRule[] = [
     created: '2024-02-01',
     modified: '2024-02-05',
     triggerEvent: 'Product viewed',
-    targetProducts: 'Best Sellers',
+    targetProducts: 'Blue Speckle Enamel Oil & Vinegar Cruet Set',
     customerSegment: 'New customers',
     suggestionLogic: { type: 'condition', value: 'Tag: Bestseller, Rating > 4.5' },
   },
@@ -157,7 +157,7 @@ export function UpsellRulesView({ onBack }: UpsellRulesViewProps) {
               className="grid gap-4 px-4 py-3 border-b"
               style={{ gridTemplateColumns: '2fr 0.8fr 1.5fr 1.3fr 1.3fr 1.5fr 1.5fr', backgroundColor: '#f7f8fa', borderColor: '#e5e8ef' }}
             >
-              {['Rule Name', 'Status', 'Trigger Event', 'Target Products', 'Customer Segment', 'Suggestion Logic', 'Last Modified'].map(
+              {['Rule Name', 'Status', 'Trigger Event', 'Target Product', 'Customer Segment', 'Suggestion Logic', 'Last Modified'].map(
                 col => (
                   <div key={col}>
                     <p className="text-xs" style={{ color: '#6b7280' }}>{col}</p>

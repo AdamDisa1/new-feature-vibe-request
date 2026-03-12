@@ -21,19 +21,19 @@ const BUNDLE_PRODUCTS = [
     name: 'Speckled White Enamel Mug Set (Set of 4)',
     price: '$29.99',
     oldPrice: '$39.99',
-    image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=300&h=300&fit=crop',
+    image: '/products/mug-set.jpg',
   },
   {
     name: 'Hand-Carved Acacia Wood Serving Board',
     price: '$19.49',
     oldPrice: '$27.00',
-    image: 'https://images.unsplash.com/photo-1588165171080-c89acfa5ee83?w=300&h=300&fit=crop',
+    image: '/products/serving-board.jpg',
   },
   {
     name: 'Blue Speckle Enamel Oil & Vinegar Cruet Set',
     price: '$55.00',
     oldPrice: '$72.00',
-    image: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=300&h=300&fit=crop',
+    image: '/products/cruet-set.jpg',
   },
 ];
 
