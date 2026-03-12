@@ -13,8 +13,7 @@ import ChatAssistant from './components/ChatAssistant';
 import BuildingDashboardPage from './components/BuildingDashboardPage';
 import HomePage from './components/HomePage';
 import WixHomePage from './components/WixHomePage';
-import { UpsellChatProvider, useUpsellChat } from './components/upsell/UpsellChatContext';
-import { UpsellChatPanel } from './components/upsell/UpsellChatPanel';
+import { UpsellChatProvider } from './components/upsell/UpsellChatContext';
 import { UpsellBuildView } from './components/upsell/UpsellBuildView';
 import { UpsellRulesView } from './components/upsell/UpsellRulesView';
 import { UpsellPreviewPage } from './components/upsell/UpsellPreviewPage';
@@ -52,9 +51,6 @@ function AppInner() {
   // Toasts
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  // Upsell chat
-  const { isUpsellPanelOpen, setIsUpsellPanelOpen } = useUpsellChat();
-
   const addToast = useCallback((message: string, type: Toast['type'] = 'success') => {
     const id = Math.random().toString(36).slice(2);
     setToasts(prev => [...prev, { id, message, type }]);
@@ -70,10 +66,10 @@ function AppInner() {
 
   // ── ChatAssistant build handlers ──────────────────────────────────────────
 
-  const handleStartBuilding = useCallback((selectedOptionLabel: string) => {
+  const handleStartBuilding = useCallback((selectedOptionLabel: string, appName?: string) => {
     setBuildingMode({
       active: true,
-      appName: 'Back In Stock Analytics',
+      appName: appName || 'Back In Stock Analytics',
       completed: false,
       freshlyBuilt: false,
     });
@@ -303,8 +299,7 @@ function AppInner() {
       {/* Top bar */}
       <WixTopBar
         onToggleChat={() => setIsChatOpen(prev => !prev)}
-        onAIClick={() => setIsUpsellPanelOpen(!isUpsellPanelOpen)}
-        isAIPanelOpen={isUpsellPanelOpen}
+        isChatOpen={isChatOpen}
       />
 
       {/* Body */}
@@ -315,7 +310,7 @@ function AppInner() {
         {/* Main */}
         <main className="flex-1 overflow-hidden">{renderContent()}</main>
 
-        {/* Chat Assistant (ChatAssistant flow) */}
+        {/* Aria Chat — single unified chat for all flows */}
         <ChatAssistant
           isOpen={isChatOpen}
           onClose={() => setIsChatOpen(false)}
@@ -332,12 +327,9 @@ function AppInner() {
           onShowEmptyCreations={handleShowEmptyCreations}
           prefillInput={prefillChatInput}
           onPrefillConsumed={() => setPrefillChatInput('')}
+          onNavigateToUpsellBuild={() => setCurrentPage('upsell-build')}
+          onNavigateToUpsellRules={() => setCurrentPage('upsell-rules')}
         />
-
-        {/* AI Chat Panel (Upsell flow) */}
-        {isUpsellPanelOpen && (
-          <UpsellChatPanel onNavigate={handleUpsellNavigate} />
-        )}
       </div>
 
       {/* Modals */}
