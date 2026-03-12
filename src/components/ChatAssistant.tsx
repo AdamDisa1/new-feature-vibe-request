@@ -228,7 +228,7 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
                   onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
                 >
-                  <ExternalLink className="w-3 h-3" /> View in Editor
+                  <ExternalLink className="w-3 h-3" /> View
                 </button>
                 <button
                   onClick={() => onNavigate('creations')}
