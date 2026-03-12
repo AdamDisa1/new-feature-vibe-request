@@ -79,9 +79,10 @@ interface ChatAssistantProps {
   prefillInput?: string;
   onPrefillConsumed?: () => void;
   onNavigate?: (page: string) => void;
+  forceUpsellFlow?: boolean;
 }
 
-const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, onEnterGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard, onGoToCreations, onShowEmptyCreations, prefillInput, onPrefillConsumed, onNavigate }) => {
+const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, generateAppMode, onExitGenerateApp, onEnterGenerateApp, editAppMode, onExitEditApp, buildingMode, onStartBuilding, onBuildComplete, onNavigateToDashboard, onGoToCreations, onShowEmptyCreations, prefillInput, onPrefillConsumed, onNavigate, forceUpsellFlow }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -89,7 +90,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
   const [visibleSteps, setVisibleSteps] = useState(0);
   const [buildCompleted, setBuildCompleted] = useState(false);
   const [buildAppName, setBuildAppName] = useState('');
-  const [upsellFlowActive, setUpsellFlowActive] = useState(false);
+  const [upsellFlowActive, setUpsellFlowActive] = useState(!!forceUpsellFlow);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -547,7 +548,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
     <div
       className="flex flex-col flex-shrink-0 border-l"
       style={{
-        width: 320,
+        width: 380,
         background: '#ffffff',
         borderColor: '#e5e8ef',
         height: '100%',
@@ -594,6 +595,9 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
       </div>
 
       {/* ── Body ──────────────────────────────────────── */}
+      {upsellFlowActive ? (
+        <UpsellFlowBody onNavigate={onNavigate || (() => {})} />
+      ) : (
       <div className="flex-1 overflow-y-auto px-5 py-6 scrollbar-none">
         {!hasConversation ? (
           /* ── Welcome state ── */
@@ -828,6 +832,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen = true, onClose, g
           </div>
         )}
       </div>
+      )}
 
       {/* ── Input area ────────────────────────────────── */}
       <div className="flex-shrink-0 px-4 pb-3 pt-2">

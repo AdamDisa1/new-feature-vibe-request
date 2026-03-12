@@ -162,10 +162,10 @@ export function UpsellFlowBody({ onNavigate }: UpsellFlowBodyProps) {
             </div>
             <p className="text-sm font-semibold" style={{ color: '#16161d' }}>Bundle Sales Dashboard page created</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
             <button
               onClick={() => onNavigate('creations')}
-              className="flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold text-white transition-colors"
+              className="w-full h-8 rounded-lg flex items-center justify-center text-xs font-semibold text-white transition-colors"
               style={{ backgroundColor: '#116dff' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#0d5fdb')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#116dff')}
@@ -174,7 +174,7 @@ export function UpsellFlowBody({ onNavigate }: UpsellFlowBodyProps) {
             </button>
             <button
               onClick={() => onNavigate('upsell-rules')}
-              className="h-9 px-4 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
+              className="w-full h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
               style={{ color: '#16161d', border: '1px solid #bbf7d0', backgroundColor: '#ffffff' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
@@ -203,10 +203,12 @@ export function UpsellFlowBody({ onNavigate }: UpsellFlowBodyProps) {
               </p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
             <button
-              onClick={() => onNavigate('upsell-widget-build')}
-              className="flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold text-white transition-colors"
+              onClick={() => {
+                window.open(window.location.origin + '?preview=editor', '_blank');
+              }}
+              className="w-full h-8 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold text-white transition-colors"
               style={{ backgroundColor: '#116dff' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#0d5fdb')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#116dff')}
@@ -215,7 +217,7 @@ export function UpsellFlowBody({ onNavigate }: UpsellFlowBodyProps) {
             </button>
             <button
               onClick={() => {}}
-              className="h-9 px-4 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
+              className="w-full h-8 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
               style={{ color: '#6b7280', border: '1px solid #e5e8ef', backgroundColor: '#ffffff' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}

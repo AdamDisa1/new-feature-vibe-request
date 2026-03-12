@@ -14,11 +14,11 @@ import BuildingDashboardPage from './components/BuildingDashboardPage';
 import HomePage from './components/HomePage';
 import WixHomePage from './components/WixHomePage';
 import { UpsellChatProvider, useUpsellChat } from './components/upsell/UpsellChatContext';
-import { UpsellChatPanel } from './components/upsell/UpsellChatPanel';
 import { UpsellBuildView } from './components/upsell/UpsellBuildView';
 import { UpsellRulesView } from './components/upsell/UpsellRulesView';
 import { UpsellPreviewPage } from './components/upsell/UpsellPreviewPage';
 import { UpsellWidgetBuildView } from './components/upsell/UpsellWidgetBuildView';
+import { EditorPreviewPage } from './components/upsell/EditorPreviewPage';
 
 type NavPage = 'home' | 'creations' | 'settings' | 'upsell-build' | 'upsell-rules' | 'upsell-widget-build';
 
@@ -53,7 +53,7 @@ function AppInner() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   // Upsell chat
-  const { isUpsellPanelOpen, setIsUpsellPanelOpen, dashboardCreated, setDashboardCreated } = useUpsellChat();
+  const { dashboardCreated } = useUpsellChat();
 
   const addToast = useCallback((message: string, type: Toast['type'] = 'success') => {
     const id = Math.random().toString(36).slice(2);
@@ -303,8 +303,7 @@ function AppInner() {
       {/* Top bar */}
       <WixTopBar
         onToggleChat={() => setIsChatOpen(prev => !prev)}
-        onAIClick={() => setIsUpsellPanelOpen(!isUpsellPanelOpen)}
-        isAIPanelOpen={isUpsellPanelOpen}
+        isAIPanelOpen={isChatOpen}
       />
 
       {/* Body */}
@@ -332,12 +331,10 @@ function AppInner() {
           onShowEmptyCreations={handleShowEmptyCreations}
           prefillInput={prefillChatInput}
           onPrefillConsumed={() => setPrefillChatInput('')}
+          onNavigate={handleUpsellNavigate}
         />
 
-        {/* AI Chat Panel (Upsell flow) */}
-        {isUpsellPanelOpen && (
-          <UpsellChatPanel onNavigate={handleUpsellNavigate} />
-        )}
+        {/* Upsell flow now lives inside ChatAssistant via UpsellFlowBody */}
       </div>
 
       {/* Modals */}
@@ -364,9 +361,16 @@ function AppInner() {
 }
 
 function App() {
-  // If opened with ?preview=cart, render the fullscreen preview page
-  if (new URLSearchParams(window.location.search).get('preview') === 'cart') {
+  const preview = new URLSearchParams(window.location.search).get('preview');
+
+  // If opened with ?preview=cart, render the fullscreen cart preview page
+  if (preview === 'cart') {
     return <UpsellPreviewPage />;
+  }
+
+  // If opened with ?preview=editor, render the editor preview (loader → skeleton + Aria)
+  if (preview === 'editor') {
+    return <EditorPreviewPage />;
   }
 
   return (
