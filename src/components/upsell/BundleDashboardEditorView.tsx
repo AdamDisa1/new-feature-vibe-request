@@ -44,10 +44,19 @@ export function BundleDashboardEditorView() {
       </div>
 
       {/* Editor canvas */}
-      <div className="flex-1 overflow-auto flex justify-center py-6 px-4">
+      <div className="flex-1 overflow-auto flex flex-col items-center">
+        {/* URL bar */}
         <div
-          className="w-full rounded-lg shadow-lg overflow-hidden"
-          style={{ maxWidth: 900, backgroundColor: '#ffffff', border: '1px solid #d0d0d0' }}
+          className="w-full flex items-center justify-center gap-3 py-2 flex-shrink-0"
+          style={{ backgroundColor: '#f7f7f9', borderBottom: '1px solid #e5e8ef' }}
+        >
+          <span className="text-xs" style={{ color: '#7a7a8e' }}>https://yoursite.wixstudio.com/my-site-24</span>
+          <button className="text-xs font-medium" style={{ color: '#116dff' }}>Connect Domain</button>
+        </div>
+        <div className="flex-1 w-full overflow-auto flex justify-center py-4 px-4">
+        <div
+          className="w-full shadow-lg overflow-hidden"
+          style={{ maxWidth: 1100, backgroundColor: '#ffffff', border: '1px solid #d0d0d0' }}
         >
           {/* Site header bar */}
           <div
@@ -191,6 +200,7 @@ export function BundleDashboardEditorView() {
               </button>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

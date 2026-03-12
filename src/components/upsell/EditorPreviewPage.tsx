@@ -4,8 +4,6 @@ import { UpsellChatProvider, useUpsellChat } from './UpsellChatContext';
 import { UpsellSkeletonCart } from './UpsellSkeletonCart';
 import { BundleDashboardEditorView } from './BundleDashboardEditorView';
 import CartPreview from './CartPreview';
-import WixTopBar from '../WixTopBar';
-import WixSidebar from '../WixSidebar';
 import ChatAssistant from '../ChatAssistant';
 import type { BuildStep } from './UpsellChatContext';
 
@@ -238,17 +236,67 @@ function EditorContent() {
   }, [ctx.widgetBuildDone, showPreview, ctx]);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#f7f8fa' }}>
-      <WixTopBar isChatOpen={true} />
+    <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#f0f0f0' }}>
+      {/* Wix Editor top bar */}
+      <div
+        className="flex items-center justify-between px-3 flex-shrink-0"
+        style={{ height: 48, backgroundColor: '#ffffff', borderBottom: '1px solid #e5e8ef' }}
+      >
+        {/* Left: Design / Code tabs */}
+        <div className="flex items-center gap-1">
+          <button
+            className="px-4 py-1.5 text-sm font-medium rounded"
+            style={{ backgroundColor: '#f0f0f5', color: '#1a1a2e' }}
+          >
+            Design
+          </button>
+          <button
+            className="px-4 py-1.5 text-sm font-medium rounded"
+            style={{ color: '#7a7a8e' }}
+          >
+            Code
+          </button>
+          <div className="w-px h-5 mx-2" style={{ backgroundColor: '#e5e8ef' }} />
+          <button className="w-8 h-8 rounded flex items-center justify-center" style={{ color: '#7a7a8e' }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg>
+          </button>
+        </div>
 
+        {/* Center: zoom + undo/redo */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs px-2 py-1 rounded" style={{ color: '#7a7a8e', backgroundColor: '#f5f5f7' }}>70%</span>
+          <div className="w-px h-5 mx-1" style={{ backgroundColor: '#e5e8ef' }} />
+          <button className="w-7 h-7 rounded flex items-center justify-center" style={{ color: '#b0b0be' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 10h4l3-7 4 14 3-7h4"/></svg>
+          </button>
+          <button className="w-7 h-7 rounded flex items-center justify-center" style={{ color: '#7a7a8e' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          </button>
+          <button className="w-7 h-7 rounded flex items-center justify-center" style={{ color: '#7a7a8e' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>
+          </button>
+          <button className="w-7 h-7 rounded flex items-center justify-center" style={{ color: '#7a7a8e' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+
+        {/* Right: Upgrade, Publish, Homepage, settings */}
+        <div className="flex items-center gap-3">
+          <button className="text-xs font-medium" style={{ color: '#116dff' }}>Upgrade</button>
+          <button
+            className="px-5 py-1.5 rounded text-xs font-semibold text-white"
+            style={{ backgroundColor: '#116dff' }}
+          >
+            Publish
+          </button>
+          <div className="w-px h-5 mx-1" style={{ backgroundColor: '#e5e8ef' }} />
+          <span className="text-xs font-medium" style={{ color: '#3b3b4f' }}>Homepage</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="#7a7a8e"><path d="M2 3.5l3 3 3-3"/></svg>
+        </div>
+      </div>
+
+      {/* Editor body: canvas + chat */}
       <div className="flex flex-1 overflow-hidden">
-        <WixSidebar
-          currentPage="creations"
-          onNavigate={() => {}}
-          buildingMode={null}
-          showBundleDashboard={true}
-        />
-
         <main className="flex-1 overflow-hidden">
           {showPreview ? <BundleDashboardEditorView /> : <UpsellSkeletonCart />}
         </main>
