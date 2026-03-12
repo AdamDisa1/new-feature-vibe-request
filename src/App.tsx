@@ -43,7 +43,7 @@ function AppInner() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [generateAppMode, setGenerateAppMode] = useState(false);
   const [editAppMode, setEditAppMode] = useState<string | null>(null);
-  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [buildingMode, setBuildingMode] = useState<BuildingModeState | null>(null);
   const [showEmptyCreations, setShowEmptyCreations] = useState(false);
   const [prefillChatInput, setPrefillChatInput] = useState('');
