@@ -94,7 +94,7 @@ export function UpsellAppCards({ onCreateWithAI }: UpsellAppCardsProps) {
             Create upsell capability with AI
           </p>
           <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
-            A tailored application to manage your recommendation rules in a dedicated dashboard page
+            A tailored bundle process to manage your recommendation rules in a dedicated dashboard page & show it to your customers
           </p>
         </div>
       </button>
