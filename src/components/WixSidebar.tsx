@@ -132,7 +132,7 @@ const WixSidebar: React.FC<Props> = ({ currentPage, onNavigate, buildingMode, sh
     const Icon = item.icon;
     const isCatalog = item.id === 'catalog';
     const isBundleDashboard = item.id === 'upsell-rules' && item.label === 'Bundle Sales Dashboard';
-    const isActive = item.id === currentPage || (isBundleDashboard && (bundleFreshlyAdded || currentPage === 'upsell-rules'));
+    const isActive = item.id === currentPage || (isBundleDashboard && showBundleDashboard);
     const isCatalogInBuildMode = buildingMode?.active && isCatalog;
     const isClickable = item.functional || isCatalog;
     const showAIHighlight = isBundleDashboard && bundleFreshlyAdded;

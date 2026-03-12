@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Sparkles, Check, Loader2 } from 'lucide-react';
 import { UpsellChatProvider, useUpsellChat } from './UpsellChatContext';
 import { UpsellSkeletonCart } from './UpsellSkeletonCart';
+import { BundleDashboardEditorView } from './BundleDashboardEditorView';
 import CartPreview from './CartPreview';
 import WixTopBar from '../WixTopBar';
 import WixSidebar from '../WixSidebar';
@@ -224,12 +225,13 @@ function EditorContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Transition skeleton → cart preview after build completes
+  // Transition skeleton → editor view after build completes, switch chat to summary
   useEffect(() => {
     if (ctx.widgetBuildDone && !showPreview) {
       const timer = setTimeout(() => {
         setShowPreview(true);
         ctx.setWidgetBuildPhase('done');
+        ctx.setSummaryMode(true);
       }, 1500);
       return () => clearTimeout(timer);
     }
@@ -248,7 +250,7 @@ function EditorContent() {
         />
 
         <main className="flex-1 overflow-hidden">
-          {showPreview ? <CartPreview /> : <UpsellSkeletonCart />}
+          {showPreview ? <BundleDashboardEditorView /> : <UpsellSkeletonCart />}
         </main>
 
         <ChatAssistant

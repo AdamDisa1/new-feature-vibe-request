@@ -16,7 +16,6 @@ import WixHomePage from './components/WixHomePage';
 import { UpsellChatProvider, useUpsellChat } from './components/upsell/UpsellChatContext';
 import { UpsellBuildView } from './components/upsell/UpsellBuildView';
 import { UpsellRulesView } from './components/upsell/UpsellRulesView';
-import { BundleDashboardEditorView } from './components/upsell/BundleDashboardEditorView';
 import { UpsellPreviewPage } from './components/upsell/UpsellPreviewPage';
 import { UpsellWidgetBuildView } from './components/upsell/UpsellWidgetBuildView';
 import { EditorPreviewPage } from './components/upsell/EditorPreviewPage';
@@ -54,7 +53,7 @@ function AppInner() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   // Upsell chat
-  const { dashboardCreated, setSummaryMode } = useUpsellChat();
+  const { dashboardCreated } = useUpsellChat();
 
   const addToast = useCallback((message: string, type: Toast['type'] = 'success') => {
     const id = Math.random().toString(36).slice(2);
@@ -148,11 +147,7 @@ function AppInner() {
 
   const handleUpsellNavigate = useCallback((page: string) => {
     setCurrentPage(page as NavPage);
-    if (page === 'upsell-rules') {
-      setSummaryMode(true);
-      setIsChatOpen(true);
-    }
-  }, [setSummaryMode]);
+  }, []);
 
   const handleUpsellBuildComplete = useCallback(() => {
     setCurrentPage('upsell-rules');
@@ -229,7 +224,7 @@ function AppInner() {
     }
 
     if (currentPage === 'upsell-rules') {
-      return <BundleDashboardEditorView />;
+      return <UpsellRulesView onBack={() => setCurrentPage('creations')} />;
     }
 
     if (currentPage === 'creations') {
