@@ -18,8 +18,9 @@ import { UpsellChatPanel } from './components/upsell/UpsellChatPanel';
 import { UpsellBuildView } from './components/upsell/UpsellBuildView';
 import { UpsellRulesView } from './components/upsell/UpsellRulesView';
 import { UpsellPreviewPage } from './components/upsell/UpsellPreviewPage';
+import { UpsellWidgetBuildView } from './components/upsell/UpsellWidgetBuildView';
 
-type NavPage = 'home' | 'creations' | 'settings' | 'upsell-build' | 'upsell-rules';
+type NavPage = 'home' | 'creations' | 'settings' | 'upsell-build' | 'upsell-rules' | 'upsell-widget-build';
 
 export interface BuildingModeState {
   active: boolean;
@@ -209,6 +210,15 @@ function AppInner() {
         <UpsellBuildView
           onBack={() => setCurrentPage('creations')}
           onBuildComplete={handleUpsellBuildComplete}
+        />
+      );
+    }
+
+    if (currentPage === 'upsell-widget-build') {
+      return (
+        <UpsellWidgetBuildView
+          onBack={() => setCurrentPage('creations')}
+          onBuildComplete={() => {}}
         />
       );
     }

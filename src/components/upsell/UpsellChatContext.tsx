@@ -44,6 +44,14 @@ interface UpsellChatState {
   buildDone: boolean;
   setBuildDone: (v: boolean) => void;
 
+  // Widget build state
+  widgetBuildPhase: 'idle' | 'building' | 'done';
+  setWidgetBuildPhase: (phase: 'idle' | 'building' | 'done') => void;
+  widgetBuildSteps: BuildStep[];
+  setWidgetBuildSteps: (steps: BuildStep[]) => void;
+  widgetBuildDone: boolean;
+  setWidgetBuildDone: (v: boolean) => void;
+
   // Post-build
   hideCreatedDate: boolean;
   setHideCreatedDate: (v: boolean) => void;
@@ -70,6 +78,9 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
   const [appBuilt, setAppBuilt] = useState(false);
   const [buildSteps, setBuildSteps] = useState<BuildStep[]>([]);
   const [buildDone, setBuildDone] = useState(false);
+  const [widgetBuildPhase, setWidgetBuildPhase] = useState<'idle' | 'building' | 'done'>('idle');
+  const [widgetBuildSteps, setWidgetBuildSteps] = useState<BuildStep[]>([]);
+  const [widgetBuildDone, setWidgetBuildDone] = useState(false);
   const [hideCreatedDate, setHideCreatedDate] = useState(false);
   const [postBuildMessages, setPostBuildMessages] = useState<PostBuildMessage[]>([]);
   const [chatInputValue, setChatInputValue] = useState('');
@@ -87,6 +98,9 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
     setAppBuilt(false);
     setBuildSteps([]);
     setBuildDone(false);
+    setWidgetBuildPhase('idle');
+    setWidgetBuildSteps([]);
+    setWidgetBuildDone(false);
     setHideCreatedDate(false);
     setPostBuildMessages([]);
     setChatInputValue('');
@@ -113,6 +127,12 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
         setBuildSteps,
         buildDone,
         setBuildDone,
+        widgetBuildPhase,
+        setWidgetBuildPhase,
+        widgetBuildSteps,
+        setWidgetBuildSteps,
+        widgetBuildDone,
+        setWidgetBuildDone,
         hideCreatedDate,
         setHideCreatedDate,
         postBuildMessages,

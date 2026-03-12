@@ -96,7 +96,7 @@ export function UpsellRulesView({ onBack }: UpsellRulesViewProps) {
               <ChevronLeft className="w-4 h-4" style={{ color: '#16161d' }} />
             </button>
             <div>
-              <h1 className="text-base font-bold" style={{ color: '#16161d' }}>Product Suggestion Rules</h1>
+              <h1 className="text-base font-bold" style={{ color: '#16161d' }}>Bundle Sales Dashboard</h1>
               <p className="text-xs" style={{ color: '#6b7280' }}>Manage your automated product recommendations</p>
             </div>
           </div>
