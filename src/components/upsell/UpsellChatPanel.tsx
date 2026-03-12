@@ -67,7 +67,6 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
     chatInputValue,
     setChatInputValue,
     setIsUpsellPanelOpen,
-    setDashboardCreated,
     widgetBuildPhase,
     widgetBuildSteps,
     widgetBuildDone,
@@ -154,7 +153,6 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
 
   const handleApproveBlueprint = () => {
     setAppBuilt(false); // will be set true when build completes
-    setDashboardCreated(true); // show in sidebar immediately
     onNavigate('upsell-build');
   };
 
@@ -164,46 +162,35 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
       {/* Handoff message */}
       <div className="pt-4" style={{ borderTop: '1px solid #e5e8ef' }}>
         <p className="text-sm" style={{ color: '#16161d', maxWidth: 301 }}>
-          I built the <span className="font-bold">Bundle Sales Dashboard</span> page for you. Now handing off to the Editor to build the <span className="font-bold">Bundle sell widget</span> — a customer-facing widget for your storefront.
+          I built the <span className="font-bold">Bundle Sales Dashboard</span> page for you. Now handing off to the Editor to build the <span className="font-bold">SiteWidget</span> — a customer-facing widget for your storefront.
         </p>
 
-        {/* Dashboard completed card */}
+        {/* Dashboard completed card (subtle, green-tinted) */}
         <div
-          className="rounded-lg p-4 mt-4 space-y-3"
+          className="rounded-lg p-3 mt-4 flex items-center gap-3"
           style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
         >
-          <div className="flex items-center gap-3">
-            <div
-              className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: '#22c55e' }}
-            >
-              <Check className="w-3.5 h-3.5" style={{ color: '#ffffff' }} />
-            </div>
-            <p className="text-sm font-semibold" style={{ color: '#16161d' }}>Bundle Sales Dashboard page created</p>
+          <div
+            className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: '#22c55e' }}
+          >
+            <Check className="w-3.5 h-3.5" style={{ color: '#ffffff' }} />
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => onNavigate('creations')}
-              className="flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold text-white transition-colors"
-              style={{ backgroundColor: '#116dff' }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#0d5fdb')}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#116dff')}
-            >
-              Manage in My Creations
-            </button>
-            <button
-              onClick={() => onNavigate('upsell-rules')}
-              className="h-9 px-4 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
-              style={{ color: '#16161d', border: '1px solid #bbf7d0', backgroundColor: '#ffffff' }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
-            >
-              View Dashboard page
-            </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold" style={{ color: '#16161d' }}>Bundle Sales Dashboard page created</p>
           </div>
+          <button
+            onClick={() => onNavigate('creations')}
+            className="text-[11px] font-medium flex items-center gap-1 flex-shrink-0 transition-colors"
+            style={{ color: '#116dff' }}
+            onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
+            onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
+          >
+            See my creations <ArrowRight className="w-3 h-3" />
+          </button>
         </div>
 
-        {/* Bundle sell widget action card */}
+        {/* SiteWidget action card (prominent) */}
         <div
           className="rounded-lg p-4 mt-3 space-y-3"
           style={{ backgroundColor: '#ffffff', border: '1px solid #e5e8ef', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
@@ -216,7 +203,7 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
               <Layers className="w-4 h-4" style={{ color: '#116dff' }} />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-bold" style={{ color: '#16161d' }}>Bundle sell widget</h4>
+              <h4 className="text-sm font-bold" style={{ color: '#16161d' }}>SiteWidget</h4>
               <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
                 Ready to build the widget component. Continue in the Editor to start.
               </p>
@@ -225,7 +212,7 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
           <div className="flex gap-2">
             <button
               onClick={() => onNavigate('upsell-widget-build')}
-              className="flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 text-xs font-semibold text-white transition-colors"
+              className="flex-1 h-8 rounded flex items-center justify-center gap-1.5 text-xs font-semibold text-white transition-colors"
               style={{ backgroundColor: '#116dff' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#0d5fdb')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#116dff')}
@@ -233,8 +220,8 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
               Continue building in Editor <ArrowRight className="w-3 h-3" />
             </button>
             <button
-              onClick={() => {}}
-              className="h-9 px-4 rounded-lg flex items-center justify-center text-xs font-medium transition-colors"
+              onClick={() => onNavigate('creations')}
+              className="h-8 px-4 rounded flex items-center justify-center text-xs font-medium transition-colors"
               style={{ color: '#6b7280', border: '1px solid #e5e8ef', backgroundColor: '#ffffff' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
@@ -249,7 +236,7 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
       {(widgetBuildPhase === 'building' || widgetBuildPhase === 'done') && (
         <div className="pt-4 mt-4" style={{ borderTop: '1px solid #e5e8ef' }}>
           <p className="text-sm font-semibold mb-3" style={{ color: '#16161d' }}>
-            Building your Bundle sell widget...
+            Building your SiteWidget...
           </p>
           <div className="space-y-1.5">
             {widgetBuildSteps.map(step => {
@@ -286,12 +273,12 @@ export function UpsellChatPanel({ onNavigate }: UpsellChatPanelProps) {
                   <Check className="w-3.5 h-3.5" style={{ color: '#ffffff' }} />
                 </div>
                 <p className="text-xs font-semibold flex-1" style={{ color: '#16161d' }}>
-                  Your Bundle sell widget is live!
+                  Your SiteWidget is live!
                 </p>
               </div>
               <button
-                onClick={() => onNavigate('upsell-rules')}
-                className="w-full h-9 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold text-white transition-colors"
+                onClick={() => onNavigate('creations')}
+                className="w-full h-9 rounded flex items-center justify-center gap-2 text-sm font-semibold text-white transition-colors"
                 style={{ backgroundColor: '#116dff' }}
                 onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#0d5fdb')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#116dff')}

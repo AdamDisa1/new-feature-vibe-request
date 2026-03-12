@@ -58,10 +58,6 @@ interface UpsellChatState {
   postBuildMessages: PostBuildMessage[];
   addPostBuildMessage: (msg: PostBuildMessage) => void;
 
-  // Dashboard created (controls sidebar visibility)
-  dashboardCreated: boolean;
-  setDashboardCreated: (v: boolean) => void;
-
   // Chat input
   chatInputValue: string;
   setChatInputValue: (value: string) => void;
@@ -87,7 +83,6 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
   const [widgetBuildDone, setWidgetBuildDone] = useState(false);
   const [hideCreatedDate, setHideCreatedDate] = useState(false);
   const [postBuildMessages, setPostBuildMessages] = useState<PostBuildMessage[]>([]);
-  const [dashboardCreated, setDashboardCreated] = useState(false);
   const [chatInputValue, setChatInputValue] = useState('');
 
   const addPostBuildMessage = useCallback((msg: PostBuildMessage) => {
@@ -106,7 +101,6 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
     setWidgetBuildPhase('idle');
     setWidgetBuildSteps([]);
     setWidgetBuildDone(false);
-    setDashboardCreated(false);
     setHideCreatedDate(false);
     setPostBuildMessages([]);
     setChatInputValue('');
@@ -139,8 +133,6 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
         setWidgetBuildSteps,
         widgetBuildDone,
         setWidgetBuildDone,
-        dashboardCreated,
-        setDashboardCreated,
         hideCreatedDate,
         setHideCreatedDate,
         postBuildMessages,
