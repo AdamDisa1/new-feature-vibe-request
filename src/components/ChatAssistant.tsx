@@ -95,14 +95,90 @@ interface ChatAssistantProps {
   forceUpsellFlow?: boolean;
 }
 
+// ── Streaming text hook ──────────────────────────────────────────────────────
+function useStreamingText(text: string, active: boolean, speed = 25) {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!active) { setDisplayed(''); setDone(false); return; }
+    let i = 0;
+    setDisplayed('');
+    setDone(false);
+    const interval = setInterval(() => {
+      i++;
+      if (i >= text.length) {
+        setDisplayed(text);
+        setDone(true);
+        clearInterval(interval);
+      } else {
+        setDisplayed(text.slice(0, i));
+      }
+    }, speed);
+    return () => clearInterval(interval);
+  }, [text, active, speed]);
+
+  return { displayed, done };
+}
+
 // ── Upsell Summary Body (clean post-build summary) ───────────────────────────
 function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void }) {
   const upsellCtx = useUpsellChat();
   const steps = upsellCtx.widgetBuildSteps;
   const buildDone = upsellCtx.widgetBuildDone;
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Sequencing state
+  const [phase, setPhase] = useState<'stream1' | 'card1' | 'stream2' | 'steps' | 'done'>('stream1');
+
+  const MSG1 = "Here's a summary of what I built for you:";
+  const MSG2 = "I'm now going to build your new Bundle Widget";
+
+  const stream1 = useStreamingText(MSG1, phase === 'stream1' || phase === 'card1' || phase === 'stream2' || phase === 'steps' || phase === 'done', 22);
+  const stream2 = useStreamingText(MSG2, phase === 'stream2' || phase === 'steps' || phase === 'done', 22);
+
+  // Sequence: stream1 done → show card1 → stream2 → build steps
+  useEffect(() => {
+    if (phase === 'stream1' && stream1.done) {
+      // Small pause before showing card
+      const t = setTimeout(() => setPhase('card1'), 300);
+      return () => clearTimeout(t);
+    }
+  }, [phase, stream1.done]);
+
+  useEffect(() => {
+    if (phase === 'card1') {
+      // Show card, then start stream2 after a moment
+      const t = setTimeout(() => setPhase('stream2'), 600);
+      return () => clearTimeout(t);
+    }
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase === 'stream2' && stream2.done) {
+      setPhase('steps');
+      // Signal EditorContent to start build steps
+      upsellCtx.setReadyForBuildSteps(true);
+    }
+  }, [phase, stream2.done, upsellCtx]);
+
+  useEffect(() => {
+    if (phase === 'steps' && buildDone) {
+      setPhase('done');
+    }
+  }, [phase, buildDone]);
+
+  // Auto-scroll as content appears
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+  }, [stream1.displayed, stream2.displayed, phase, steps, buildDone]);
+
+  const showCard1 = phase === 'card1' || phase === 'stream2' || phase === 'steps' || phase === 'done';
+  const showSecondBlock = phase === 'stream2' || phase === 'steps' || phase === 'done';
+  const showSteps = phase === 'steps' || phase === 'done';
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5">
+    <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-5">
       {/* Aria greeting + Dashboard card */}
       <div className="flex gap-3">
         <div
@@ -112,99 +188,16 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
           <Sparkles className="w-3.5 h-3.5" style={{ color: '#ffffff' }} />
         </div>
         <div className="flex-1 space-y-4" style={{ maxWidth: 310 }}>
-          <p className="text-sm" style={{ color: '#16161d' }}>
-            Here's a summary of what I built for you:
+          <p className="text-sm" style={{ color: '#16161d', minHeight: '1.25rem' }}>
+            {stream1.displayed}
+            {!stream1.done && <span className="animate-pulse">|</span>}
           </p>
 
           {/* Dashboard card — no green background */}
-          <div
-            className="rounded-lg p-3 space-y-2.5"
-            style={{ backgroundColor: '#f7f8fa', border: '1px solid #e5e8ef' }}
-          >
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: '#22c55e' }}
-              >
-                <Check className="w-3 h-3" style={{ color: '#ffffff' }} />
-              </div>
-              <p className="text-xs font-semibold" style={{ color: '#16161d' }}>
-                Bundle Sales Dashboard
-              </p>
-            </div>
-            <p className="text-xs" style={{ color: '#6b7280' }}>
-              A dedicated dashboard page to manage your recommendation rules, track performance, and configure product bundles.
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => onNavigate('upsell-rules')}
-                className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
-                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #e5e8ef' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
-              >
-                <ExternalLink className="w-3 h-3" /> View
-              </button>
-              <button
-                onClick={() => onNavigate('creations')}
-                className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
-                style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #e5e8ef' }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
-              >
-                Manage
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Aria message: building widget */}
-      <div className="flex gap-3">
-        <div
-          className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-          style={{ backgroundColor: '#116dff' }}
-        >
-          <Sparkles className="w-3.5 h-3.5" style={{ color: '#ffffff' }} />
-        </div>
-        <div className="flex-1 space-y-4" style={{ maxWidth: 310 }}>
-          <p className="text-sm" style={{ color: '#16161d' }}>
-            I'm now going to build your new Bundle Widget
-          </p>
-
-          {/* Build steps */}
-          {steps.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-sm font-semibold" style={{ color: '#16161d' }}>
-                {buildDone ? 'Bundle widget added to your page' : 'Adding bundle widget to your page...'}
-              </p>
-              <div className="space-y-1.5">
-                {steps.map(step => (
-                  <div key={step.id} className="flex items-center gap-2">
-                    {step.status === 'completed' ? (
-                      <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22c55e' }} />
-                    ) : step.status === 'active' ? (
-                      <Loader2 className="w-3.5 h-3.5 flex-shrink-0 animate-spin" style={{ color: '#116dff' }} />
-                    ) : (
-                      <div className="w-3.5 h-3.5 flex-shrink-0 rounded-full" style={{ border: '1.5px solid #d1d5db' }} />
-                    )}
-                    <span
-                      className="text-xs"
-                      style={{ color: step.status === 'active' ? '#16161d' : step.status === 'completed' ? '#6b7280' : '#9ca3af' }}
-                    >
-                      {step.message}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Widget card — shown after build completes, with green background */}
-          {buildDone && (
+          {showCard1 && (
             <div
               className="rounded-lg p-3 space-y-2.5"
-              style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
+              style={{ backgroundColor: '#f7f8fa', border: '1px solid #e5e8ef', animation: 'fadeInUp 0.3s ease-out' }}
             >
               <div className="flex items-center gap-2.5">
                 <div
@@ -214,18 +207,18 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
                   <Check className="w-3 h-3" style={{ color: '#ffffff' }} />
                 </div>
                 <p className="text-xs font-semibold" style={{ color: '#16161d' }}>
-                  Bundle Sell Widget
+                  Bundle Sales Dashboard
                 </p>
               </div>
               <p className="text-xs" style={{ color: '#6b7280' }}>
-                A customer-facing storefront widget that shows product recommendations at checkout.
+                A dedicated dashboard page to manage your recommendation rules, track performance, and configure product bundles.
               </p>
               <div className="flex gap-2">
                 <button
-                  onClick={() => window.open(window.location.origin + '?preview=editor', '_blank')}
+                  onClick={() => onNavigate('upsell-rules')}
                   className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
-                  style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                  style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #e5e8ef' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
                 >
                   <ExternalLink className="w-3 h-3" /> View
@@ -233,8 +226,8 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
                 <button
                   onClick={() => onNavigate('creations')}
                   className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
-                  style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                  style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #e5e8ef' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7f8fa')}
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
                 >
                   Manage
@@ -242,14 +235,110 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
               </div>
             </div>
           )}
-
-          {buildDone && (
-            <p className="text-xs" style={{ color: '#6b7280' }}>
-              Is there anything else you'd like me to help with?
-            </p>
-          )}
         </div>
       </div>
+
+      {/* Aria message: building widget */}
+      {showSecondBlock && (
+        <div className="flex gap-3">
+          <div
+            className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+            style={{ backgroundColor: '#116dff' }}
+          >
+            <Sparkles className="w-3.5 h-3.5" style={{ color: '#ffffff' }} />
+          </div>
+          <div className="flex-1 space-y-4" style={{ maxWidth: 310 }}>
+            <p className="text-sm" style={{ color: '#16161d', minHeight: '1.25rem' }}>
+              {stream2.displayed}
+              {!stream2.done && <span className="animate-pulse">|</span>}
+            </p>
+
+            {/* Build steps */}
+            {showSteps && steps.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-semibold" style={{ color: '#16161d' }}>
+                  {buildDone ? 'Bundle widget added to your page' : 'Adding bundle widget to your page...'}
+                </p>
+                <div className="space-y-1.5">
+                  {steps.map(step => (
+                    <div key={step.id} className="flex items-center gap-2">
+                      {step.status === 'completed' ? (
+                        <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#22c55e' }} />
+                      ) : step.status === 'active' ? (
+                        <Loader2 className="w-3.5 h-3.5 flex-shrink-0 animate-spin" style={{ color: '#116dff' }} />
+                      ) : (
+                        <div className="w-3.5 h-3.5 flex-shrink-0 rounded-full" style={{ border: '1.5px solid #d1d5db' }} />
+                      )}
+                      <span
+                        className="text-xs"
+                        style={{ color: step.status === 'active' ? '#16161d' : step.status === 'completed' ? '#6b7280' : '#9ca3af' }}
+                      >
+                        {step.message}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Widget card — shown after build completes, with green background */}
+            {buildDone && (
+              <div
+                className="rounded-lg p-3 space-y-2.5"
+                style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', animation: 'fadeInUp 0.3s ease-out' }}
+              >
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: '#22c55e' }}
+                  >
+                    <Check className="w-3 h-3" style={{ color: '#ffffff' }} />
+                  </div>
+                  <p className="text-xs font-semibold" style={{ color: '#16161d' }}>
+                    Bundle Sell Widget
+                  </p>
+                </div>
+                <p className="text-xs" style={{ color: '#6b7280' }}>
+                  A customer-facing storefront widget that shows product recommendations at checkout.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => window.open(window.location.origin + '?preview=editor', '_blank')}
+                    className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
+                    style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
+                  >
+                    <ExternalLink className="w-3 h-3" /> View
+                  </button>
+                  <button
+                    onClick={() => onNavigate('creations')}
+                    className="flex-1 h-7 rounded flex items-center justify-center gap-1 text-[11px] font-medium transition-colors"
+                    style={{ backgroundColor: '#ffffff', color: '#16161d', border: '1px solid #bbf7d0' }}
+                    onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f0fdf4')}
+                    onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#ffffff')}
+                  >
+                    Manage
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {buildDone && (
+              <p className="text-xs" style={{ color: '#6b7280' }}>
+                Is there anything else you'd like me to help with?
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

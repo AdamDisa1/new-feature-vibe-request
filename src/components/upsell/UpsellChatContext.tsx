@@ -66,6 +66,10 @@ interface UpsellChatState {
   summaryMode: boolean;
   setSummaryMode: (v: boolean) => void;
 
+  // Coordination: chat signals when build steps can start
+  readyForBuildSteps: boolean;
+  setReadyForBuildSteps: (v: boolean) => void;
+
   // Chat input
   chatInputValue: string;
   setChatInputValue: (value: string) => void;
@@ -93,6 +97,7 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
   const [postBuildMessages, setPostBuildMessages] = useState<PostBuildMessage[]>([]);
   const [dashboardCreated, setDashboardCreated] = useState(false);
   const [summaryMode, setSummaryMode] = useState(false);
+  const [readyForBuildSteps, setReadyForBuildSteps] = useState(false);
   const [chatInputValue, setChatInputValue] = useState('');
 
   const addPostBuildMessage = useCallback((msg: PostBuildMessage) => {
@@ -115,6 +120,7 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
     setHideCreatedDate(false);
     setPostBuildMessages([]);
     setSummaryMode(false);
+    setReadyForBuildSteps(false);
     setChatInputValue('');
   }, []);
 
@@ -149,6 +155,8 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
         setDashboardCreated,
         summaryMode,
         setSummaryMode,
+        readyForBuildSteps,
+        setReadyForBuildSteps,
         hideCreatedDate,
         setHideCreatedDate,
         postBuildMessages,

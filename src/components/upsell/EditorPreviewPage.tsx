@@ -169,12 +169,18 @@ function EditorContent() {
   const stepsRef = useRef<BuildStep[]>(
     WIDGET_BUILD_STEPS_DATA.map(step => ({ ...step, status: 'pending' as const })),
   );
+  const [pageVisible, setPageVisible] = useState(false);
+  const [bundleRevealed, setBundleRevealed] = useState(false);
+  const buildStepsStartedRef = useRef(false);
 
   // Initialize context — show summary immediately, editor view from start
   useEffect(() => {
     ctx.setAppBuilt(true);
     ctx.setDashboardCreated(true);
     ctx.setSummaryMode(true);
+    // Show page content after 0.5s delay
+    const t = setTimeout(() => setPageVisible(true), 500);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -208,8 +214,11 @@ function EditorContent() {
     }
   }, [ctx]);
 
-  // Kick off widget build
+  // Start build steps only when chat signals readyForBuildSteps
   useEffect(() => {
+    if (!ctx.readyForBuildSteps || buildStepsStartedRef.current) return;
+    buildStepsStartedRef.current = true;
+
     ctx.setWidgetBuildPhase('building');
     stepsRef.current = WIDGET_BUILD_STEPS_DATA.map(step => ({ ...step, status: 'pending' as const }));
     ctx.setWidgetBuildSteps(stepsRef.current);
@@ -219,12 +228,14 @@ function EditorContent() {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ctx.readyForBuildSteps]);
 
-  // Mark build phase done when all steps complete
+  // Mark build phase done when all steps complete, reveal bundle after 0.4s
   useEffect(() => {
     if (ctx.widgetBuildDone) {
       ctx.setWidgetBuildPhase('done');
+      const t = setTimeout(() => setBundleRevealed(true), 400);
+      return () => clearTimeout(t);
     }
   }, [ctx.widgetBuildDone, ctx]);
 
@@ -290,8 +301,14 @@ function EditorContent() {
 
       {/* Editor body: canvas + chat */}
       <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 overflow-hidden">
-          <BundleDashboardEditorView bundleLoading={!ctx.widgetBuildDone} />
+        <main
+          className="flex-1 overflow-hidden"
+          style={{
+            opacity: pageVisible ? 1 : 0,
+            transition: 'opacity 0.4s ease-out',
+          }}
+        >
+          <BundleDashboardEditorView bundleLoading={!bundleRevealed} />
         </main>
 
         <ChatAssistant
