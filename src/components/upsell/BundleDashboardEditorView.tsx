@@ -315,13 +315,13 @@ export function BundleDashboardEditorView({ bundleLoading = false }: { bundleLoa
                   >
                     <div>
                       <p className="text-xs font-medium" style={{ color: '#e85d2a' }}>Bundle Deal</p>
-                      <p className="text-[10px]" style={{ color: '#999' }}>Add all 3 items and save 20%</p>
+                      <p className="text-[10px]" style={{ color: '#999' }}>Add all {visibleProducts.length} item{visibleProducts.length !== 1 ? 's' : ''} and save 20%</p>
                     </div>
                     <button
                       className="px-4 py-1.5 rounded-lg text-xs font-medium text-white"
                       style={{ backgroundColor: '#e85d2a' }}
                     >
-                      ADD ALL TO CART — $104.48
+                      ADD ALL TO CART — ${visibleProducts.reduce((sum, p) => sum + parseFloat(p.price.replace('$', '')), 0).toFixed(2)}
                     </button>
                   </div>
                 </div>
