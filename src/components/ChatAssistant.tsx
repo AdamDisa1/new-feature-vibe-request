@@ -197,16 +197,22 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
         </div>
         <div className="flex-1 space-y-4" style={{ maxWidth: 310 }}>
           {phase === 'delay' ? (
-            <div
-              className="rounded-xl px-3.5 py-2.5 text-[13px] inline-block"
-              style={{ background: '#f7f8fa', color: '#9098a9' }}
-            >
-              <span className="inline-flex gap-1">
-                <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
-                <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
-                <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
-              </span>
-            </div>
+            <>
+              <p className="text-xs" style={{ color: '#6b7280' }}>AI Assistant</p>
+              <div className="flex items-center gap-1 py-1">
+                {[0, 1, 2].map(i => (
+                  <span
+                    key={i}
+                    className="inline-block rounded-full"
+                    style={{
+                      width: 6, height: 6,
+                      backgroundColor: '#6b7280',
+                      animation: `typing-dot 1.2s ease-in-out ${i * 0.2}s infinite`,
+                    }}
+                  />
+                ))}
+              </div>
+            </>
           ) : (
           <p className="text-sm" style={{ color: '#16161d', minHeight: '1.25rem' }}>
             {stream1.displayed}
