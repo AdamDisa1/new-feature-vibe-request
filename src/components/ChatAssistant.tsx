@@ -131,10 +131,10 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
   // Sequencing state — start with a delay before streaming begins
   const [phase, setPhase] = useState<'delay' | 'stream1' | 'card1' | 'stream2' | 'steps' | 'done'>('delay');
 
-  // Initial 0.8s delay before chat starts
+  // Initial 1.5s typing-dots delay before chat starts
   useEffect(() => {
     if (phase === 'delay') {
-      const t = setTimeout(() => setPhase('stream1'), 800);
+      const t = setTimeout(() => setPhase('stream1'), 1500);
       return () => clearTimeout(t);
     }
   }, [phase]);
@@ -196,10 +196,23 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
           <Sparkles className="w-3.5 h-3.5" style={{ color: '#ffffff' }} />
         </div>
         <div className="flex-1 space-y-4" style={{ maxWidth: 310 }}>
+          {phase === 'delay' ? (
+            <div
+              className="rounded-xl px-3.5 py-2.5 text-[13px] inline-block"
+              style={{ background: '#f7f8fa', color: '#9098a9' }}
+            >
+              <span className="inline-flex gap-1">
+                <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+              </span>
+            </div>
+          ) : (
           <p className="text-sm" style={{ color: '#16161d', minHeight: '1.25rem' }}>
             {stream1.displayed}
             {!stream1.done && <span className="animate-pulse">|</span>}
           </p>
+          )}
 
           {/* Dashboard card — no green background */}
           {showCard1 && (
