@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 
 type ChatPhase = 'welcome' | 'conversation';
 
@@ -103,7 +103,24 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
   const [summaryMode, setSummaryMode] = useState(false);
   const [readyForBuildSteps, setReadyForBuildSteps] = useState(false);
   const [chatInputValue, setChatInputValue] = useState('');
-  const [activeRuleIds, setActiveRuleIds] = useState<string[]>(['1', '2']);
+  const [activeRuleIds, _setActiveRuleIds] = useState<string[]>(['1', '2']);
+  const ruleChannelRef = useRef<BroadcastChannel | null>(null);
+
+  // BroadcastChannel to sync activeRuleIds across tabs
+  useEffect(() => {
+    const ch = new BroadcastChannel('upsell-active-rules');
+    ruleChannelRef.current = ch;
+    ch.onmessage = (e: MessageEvent) => {
+      if (Array.isArray(e.data)) _setActiveRuleIds(e.data);
+    };
+    return () => ch.close();
+  }, []);
+
+  // Wrapper that also broadcasts to other tabs
+  const setActiveRuleIds = useCallback((ids: string[]) => {
+    _setActiveRuleIds(ids);
+    ruleChannelRef.current?.postMessage(ids);
+  }, []);
 
   const addPostBuildMessage = useCallback((msg: PostBuildMessage) => {
     setPostBuildMessages(prev => [...prev, msg]);
