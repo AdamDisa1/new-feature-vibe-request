@@ -128,13 +128,21 @@ function UpsellSummaryBody({ onNavigate }: { onNavigate: (page: string) => void 
   const buildDone = upsellCtx.widgetBuildDone;
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Sequencing state
-  const [phase, setPhase] = useState<'stream1' | 'card1' | 'stream2' | 'steps' | 'done'>('stream1');
+  // Sequencing state — start with a delay before streaming begins
+  const [phase, setPhase] = useState<'delay' | 'stream1' | 'card1' | 'stream2' | 'steps' | 'done'>('delay');
+
+  // Initial 0.8s delay before chat starts
+  useEffect(() => {
+    if (phase === 'delay') {
+      const t = setTimeout(() => setPhase('stream1'), 800);
+      return () => clearTimeout(t);
+    }
+  }, [phase]);
 
   const MSG1 = "Here's a summary of what I built for you:";
   const MSG2 = "I'm now going to build your new Bundle Widget";
 
-  const stream1 = useStreamingText(MSG1, phase === 'stream1' || phase === 'card1' || phase === 'stream2' || phase === 'steps' || phase === 'done', 22);
+  const stream1 = useStreamingText(MSG1, phase !== 'delay', 22);
   const stream2 = useStreamingText(MSG2, phase === 'stream2' || phase === 'steps' || phase === 'done', 22);
 
   // Sequence: stream1 done → show card1 → stream2 → build steps
