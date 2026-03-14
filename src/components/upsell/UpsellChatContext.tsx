@@ -74,6 +74,10 @@ interface UpsellChatState {
   chatInputValue: string;
   setChatInputValue: (value: string) => void;
 
+  // Active rule IDs (controls which bundle products are visible)
+  activeRuleIds: string[];
+  setActiveRuleIds: (ids: string[]) => void;
+
   // Reset
   resetChat: () => void;
 }
@@ -99,6 +103,7 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
   const [summaryMode, setSummaryMode] = useState(false);
   const [readyForBuildSteps, setReadyForBuildSteps] = useState(false);
   const [chatInputValue, setChatInputValue] = useState('');
+  const [activeRuleIds, setActiveRuleIds] = useState<string[]>(['1', '2']);
 
   const addPostBuildMessage = useCallback((msg: PostBuildMessage) => {
     setPostBuildMessages(prev => [...prev, msg]);
@@ -122,6 +127,7 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
     setSummaryMode(false);
     setReadyForBuildSteps(false);
     setChatInputValue('');
+    setActiveRuleIds(['1', '2']);
   }, []);
 
   return (
@@ -163,6 +169,8 @@ export function UpsellChatProvider({ children }: { children: ReactNode }) {
         addPostBuildMessage,
         chatInputValue,
         setChatInputValue,
+        activeRuleIds,
+        setActiveRuleIds,
         resetChat,
       }}
     >

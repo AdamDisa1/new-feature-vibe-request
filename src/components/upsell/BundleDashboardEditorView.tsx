@@ -1,5 +1,6 @@
 import { Plus, Type, Image, Layers, LayoutGrid, Columns, Table2, Users, AppWindow, CheckSquare, MessageSquare, HelpCircle, Minus, ShoppingBag } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useUpsellChat } from './UpsellChatContext';
 
 // A Wix-Editor-like page showing the Bundle Sales Dashboard in an editor canvas
 
@@ -15,21 +16,24 @@ const PRODUCT_IMAGES = [
   'https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?w=150&h=150&fit=crop',
 ];
 
-// Bundle product images
+// Bundle product images — ruleId links each product to a dashboard rule
 const BUNDLE_PRODUCTS = [
   {
+    ruleId: '1',
     name: 'Speckled White Enamel Mug Set (Set of 4)',
     price: '$29.99',
     oldPrice: '$39.99',
     image: '/products/mug-set.jpg',
   },
   {
+    ruleId: '2',
     name: 'Hand-Carved Acacia Wood Serving Board',
     price: '$19.49',
     oldPrice: '$27.00',
     image: '/products/serving-board.jpg',
   },
   {
+    ruleId: '3',
     name: 'Blue Speckle Enamel Oil & Vinegar Cruet Set',
     price: '$55.00',
     oldPrice: '$72.00',
@@ -38,6 +42,8 @@ const BUNDLE_PRODUCTS = [
 ];
 
 export function BundleDashboardEditorView({ bundleLoading = false }: { bundleLoading?: boolean }) {
+  const { activeRuleIds } = useUpsellChat();
+  const visibleProducts = BUNDLE_PRODUCTS.filter(p => activeRuleIds.includes(p.ruleId));
   const [quantity, setQuantity] = useState(1);
   // Small delay after bundleLoading becomes false to animate the reveal
   const [showBundle, setShowBundle] = useState(false);
@@ -275,8 +281,8 @@ export function BundleDashboardEditorView({ bundleLoading = false }: { bundleLoa
                       SAVE 20%
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    {BUNDLE_PRODUCTS.map((product, i) => (
+                  <div className={`grid gap-4 ${visibleProducts.length >= 3 ? 'grid-cols-3' : visibleProducts.length === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                    {visibleProducts.map((product, i) => (
                       <div key={i} className="group cursor-pointer">
                         <div
                           className="rounded-lg overflow-hidden mb-2 transition-shadow"

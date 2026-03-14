@@ -62,18 +62,21 @@ interface UpsellRulesViewProps {
 }
 
 export function UpsellRulesView({ onBack }: UpsellRulesViewProps) {
-  const { hideCreatedDate } = useUpsellChat();
+  const { hideCreatedDate, setActiveRuleIds } = useUpsellChat();
   const [rules, setRules] = useState<SuggestionRule[]>(mockRules);
   const [searchQuery, setSearchQuery] = useState('');
 
   const toggleRuleStatus = (id: string) => {
-    setRules(prev =>
-      prev.map(rule =>
+    setRules(prev => {
+      const updated = prev.map(rule =>
         rule.id === id
-          ? { ...rule, status: rule.status === 'active' ? 'inactive' : 'active', modified: new Date().toISOString().split('T')[0] }
+          ? { ...rule, status: (rule.status === 'active' ? 'inactive' : 'active') as 'active' | 'inactive', modified: new Date().toISOString().split('T')[0] }
           : rule,
-      ),
-    );
+      );
+      // Sync active rule IDs to context so bundle products update
+      setActiveRuleIds(updated.filter(r => r.status === 'active').map(r => r.id));
+      return updated;
+    });
   };
 
   const filteredRules = rules.filter(rule =>
